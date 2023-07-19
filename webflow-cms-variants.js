@@ -6,6 +6,11 @@ const variantGroupSettings = {
   sortOrder: "Ascending", //Ascending or Descending (or leave blank for default sorting)
 };
 
+const pricingSettings = {
+  locale: "en-US", //
+  currency: "USD", //
+};
+
 // End Script Configuration
 
 // Constants and variables
@@ -19,9 +24,8 @@ const fc_variant_item = "[fc-variant-item]";
 const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
 const variantItems = { serialized: {}, array: [] };
 const variantGroups = [];
-
 const isSelect = variantGroupSettings.type === "select";
-
+const money = moneyFormat(pricingSettings.locale, pricingSettings.currency);
 function init() {
   // Set quantity input defaults
   const quantityInput = foxyForm.querySelector('input[name="quantity"]');
@@ -226,14 +230,14 @@ function addPrice() {
       .sort((a, b) => a - b);
 
     if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
-      const priceText = `${moneyFormat(sortedPrices[0])}-${moneyFormat(
+      const priceText = `${money.format(sortedPrices[0])}-${money.format(
         sortedPrices[sortedPrices.length - 1]
       )}`;
       priceElement.textContent = priceText;
       priceElement.classList.remove("w-dyn-bind-empty");
     } else {
       // Variants that don't affect price
-      const price = moneyFormat(sortedPrices[0]);
+      const price = money.format(sortedPrices[0]);
       priceElement.textContent = price;
       priceAddToCart.value = price;
     }
@@ -330,34 +334,12 @@ function isVariantsSelectionComplete() {
   return false;
 }
 
-function moneyFormat(price) {
-  return typeof FC == "object" &&
-    FC.hasOwnProperty("json") &&
-    FC.json.config.hasOwnProperty("currency_format")
-    ? FC.util.money_format(FC.json.config.currency_format, price).trim()
-    : price.formatMoney(2);
+function moneyFormat(locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+  });
 }
-
-Number.prototype.formatMoney = function (c, d, t) {
-  var n = this,
-    c = isNaN((c = Math.abs(c))) ? 2 : c,
-    d = d == undefined ? "." : d,
-    t = t == undefined ? "," : t,
-    s = n < 0 ? "-" : "",
-    i = parseInt((n = Math.abs(+n || 0).toFixed(c))) + "",
-    j = (j = i.length) > 3 ? j % 3 : 0;
-  return (
-    s +
-    (j ? i.substr(0, j) + t : "") +
-    i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) +
-    (c
-      ? d +
-        Math.abs(n - i)
-          .toFixed(c)
-          .slice(2)
-      : "")
-  );
-};
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
