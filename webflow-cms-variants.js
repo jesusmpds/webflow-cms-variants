@@ -242,7 +242,7 @@ function addPrice() {
 
 function setInventory() {
   if (variantItems.array.length === 1) {
-    addToCartQuantityMax.value = variantItems.array[0].inventory;
+    addToCartQuantityMax.value = variantItems.array[0]?.inventory ?? 0;
     return;
   }
 }
@@ -250,26 +250,74 @@ function setInventory() {
 function handleVariantSelection(e) {
   const { name, value } = e.target;
   console.log("handleVariantSelection", e.target);
-  const variantSelectionGroup = name;
-  const availableProductsPerVariant = [];
-  const sanitizedValue = sanitize(value);
-  const isVariantsSelectionDone = isVariantsSelectionComplete();
+  const variantSelectionGroup = sanitize(name);
+  const variantSelection = sanitize(value);
 
+  const isVariantsSelectionDone = isVariantsSelectionComplete();
+  const availableProductsPerVariant = [];
+
+  variantItems.array.forEach(variant => {
+    const currentProduct = Object.values(variant);
+
+    if (currentProduct.includes(variantSelection)) {
+      availableProductsPerVariant.push(variant);
+    }
+  });
+  console.log(availableProductsPerVariant);
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone) return; //handleQuantityChange();
 
-  if (isVariantsSelectionDone) {
-    // updateProductInfo(availableProductsPerVariant);
-  } else {
-    // Update variant group options
-    const variantGroup = variantGroups.find(variantGroup => variantGroup.name === name);
-    // updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
-  }
+  //updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
+  // updateProductInfo(availableProductsPerVariant);
 
   // Update price
   addPrice();
 }
 
-function updateVariantOptions(availableProductsPerVariant) {}
+function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
+  const otherVariantGroups = variantGroups.filter(
+    variantGroup => variantGroup !== variantSelectionGroup
+  );
+
+  otherVariantGroups.forEach(otherGroup => {
+    // Check if other groups have selections
+    const otherGroupParent = element.querySelector(`#variants-${otherGroup.toLowerCase()}`);
+    let hasSelection = null;
+    if (otherGroupParent) {
+      hasSelection = element
+        .querySelector(`#variants-${otherGroup.toLowerCase()}`)
+        .classList.contains("option-selected");
+    }
+
+    //Get all values from other groups / remove all dashes
+    const otherGroupInputsValues = [];
+    element.querySelectorAll(`input[name=${otherGroup}]`).forEach(input => {
+      otherGroupInputsValues.push(input.value);
+      input.parentElement.classList.remove(RADIO_DISABLED);
+    });
+
+    const availableProductNames = availableProductsPerVariant.map(e => e[otherGroup.toLowerCase()]);
+
+    const unavailableOptions = otherGroupInputsValues.filter(
+      value => availableProductNames.indexOf(value) == -1
+    );
+
+    unavailableOptions.forEach(option => {
+      element.querySelector(`input[value="${option}"]`).parentElement.classList.add(RADIO_DISABLED);
+    });
+
+    if (hasSelection && unavailableOptions.length !== 0) {
+      unavailableOptions.forEach(option => {
+        const unavailableElement = element.querySelector(`input[value="${option}"]:checked`);
+        if (unavailableElement) {
+          unavailableElement.checked = false;
+          unavailableElement.parentElement.classList.add(RADIO_DISABLED);
+          unavailableElement.previousElementSibling.classList.remove("w--redirected-checked");
+          unavailableElement.parentElement.parentElement.classList.remove("option-selected");
+        }
+      });
+    }
+  });
+}
 
 function updateProductInfo(availableProductsPerVariant) {}
 
