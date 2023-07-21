@@ -12,13 +12,14 @@ const pricingSettings = {
 // End Script Configuration
 
 // Constants and variables
-const imageElement = foxyForm.querySelector("[fc-image]");
+
 const disableClass = "fc-disable";
 const fc_variant_item = "[fc-variant-item]";
 let variantSelectionCompleteProduct;
 const variantItems = { serialized: {}, array: [] };
 const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
+const imageElement = foxyForm.querySelector("[fc-image]");
 const quantityElement = document.querySelector("[fc-quantity]");
 const priceElement = document.querySelector("[fc-price]");
 const inventoryElement = document.querySelector("[fc-stock]");
