@@ -279,7 +279,7 @@ function handleVariantSelection(e) {
   variantItems.array.forEach(variant => {
     const currentProduct = Object.values(variant);
 
-    if (currentProduct.includes(variantSelection) && variant.inventory) {
+    if (currentProduct.includes(variantSelection) && Number(variant.inventory) > 0) {
       availableProductsPerVariant.push(variant);
     }
   });
