@@ -12,9 +12,10 @@ const pricingSettings = {
 // End Script Configuration
 
 // Constants and variables
-const fc_image = "[fc-image]";
+const imageElement = foxyForm.querySelector("[fc-image]");
 const disableClass = "fc-disable";
 const fc_variant_item = "[fc-variant-item]";
+let variantSelectionCompleteProduct;
 const variantItems = { serialized: {}, array: [] };
 const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
@@ -299,7 +300,7 @@ function handleVariantSelection(e) {
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone) return; //handleQuantityChange();
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
-  // updateProductInfo(availableProductsPerVariant);
+  updateProductInfo(availableProductsPerVariant);
 
   // Update price
   addPrice();
@@ -356,7 +357,52 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
   });
 }
 
-function updateProductInfo(availableProductsPerVariant) {}
+function updateProductInfo(availableProductsPerVariant) {
+  if (isVariantsSelectionComplete()) {
+    // Save the selected product variant
+    let selectedProductVariant = {};
+    foxyForm.querySelectorAll("input:checked").forEach(variant => {
+      selectedProductVariant[sanitize(variant.name)] = sanitize(variant.value);
+    });
+
+    // Find Selected Product Variant Total Information
+    variantSelectionCompleteProduct = availableProductsPerVariant.find(product => {
+      let isProduct = [];
+      Object.keys(selectedProductVariant).forEach(key => {
+        product[key] === selectedProductVariant[key] ? isProduct.push(true) : isProduct.push(false);
+      });
+      return isProduct.every(productCheck => productCheck === true);
+    });
+
+    // Update Hidden Add to Cart Inputs with Variant Data and
+    //DOM customer facing elements with product info
+    Object.keys(variantSelectionCompleteProduct).forEach(key => {
+      const inputToUpdate = foxyForm.querySelector(`input[name="${key}"]`);
+      if (inputToUpdate) inputToUpdate.value = variantSelectionCompleteProduct[key];
+
+      switch (key) {
+        case "inventory":
+          // Update max quantity
+          element.querySelector(`input[name="quantity_max"]`).value =
+            variantSelectionCompleteProduct[key];
+          //handleQuantityChange();
+          break;
+        case "price":
+          priceElement.textContent = money.format(variantSelectionCompleteProduct[key]);
+          break;
+        case "image":
+          imageElement.src = variantSelectionCompleteProduct[key];
+          break;
+      }
+    });
+    return;
+  }
+
+  // Not variant selection complete
+  addPrice();
+
+  setInventory();
+}
 
 // Utils
 
