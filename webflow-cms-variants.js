@@ -329,7 +329,6 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
       unavailableOptions.forEach(option => {
         const variantOption = capitalizeFirstLetter(option);
         const radioInput = element.querySelector(`input[value="${variantOption}"]`);
-        radioInput.checked = false;
         radioInput.parentElement.classList.add(disableClass);
 
         // if variant group already has a selection
