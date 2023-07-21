@@ -315,6 +315,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
     const availableProductOptions = availableProductsPerVariant.map(e => e[name]);
 
     const unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
+    console.log("unavailableOptions", unavailableOptions);
 
     // Disable unavailable options for radio elements or select input elements. capitalize the values to match the DOM
 
@@ -339,7 +340,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
           if (unavailableElement) {
             unavailableElement.checked = false;
             unavailableElement.parentElement.classList.add(disableClass);
-            unavailableElement.previousElementSibling.classList.remove("w--redirected-checked");
+            unavailableElement?.previousElementSibling?.classList?.remove("w--redirected-checked");
           }
         }
       });
