@@ -20,7 +20,7 @@ const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
 const quantityElement = document.querySelector("[fc-quantity]");
 const priceElement = document.querySelector("[fc-price]");
-const stockElement = document.querySelector("[fc-stock]");
+const inventoryElement = document.querySelector("[fc-stock]");
 const priceAddToCart = foxyForm.querySelector("input[name='price']");
 const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
 const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
@@ -263,6 +263,12 @@ function addPrice() {
 function setInventory() {
   if (variantItems.array.length === 1) {
     addToCartQuantityMax.value = variantItems.array[0]?.inventory ?? 0;
+    return;
+  }
+
+  if (variantItems.array.length > 1) {
+    inventoryElement.textContent = "Please choose options.";
+    inventoryElement.classList.remove("w-dyn-bind-empty");
     return;
   }
 }
