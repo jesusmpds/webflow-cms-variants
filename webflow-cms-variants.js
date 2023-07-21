@@ -20,6 +20,7 @@ const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
 const quantityElement = document.querySelector("[fc-quantity]");
 const priceElement = document.querySelector("[fc-price]");
+const stockElement = document.querySelector("[fc-stock]");
 const priceAddToCart = foxyForm.querySelector("input[name='price']");
 const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
 const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
@@ -320,9 +321,10 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
       // Remove unavailable options
       unavailableOptions.forEach(option => {
         const variantOption = capitalizeFirstLetter(option);
-        element
-          .querySelector(`input[value="${variantOption}"]`)
-          .parentElement.classList.add(disableClass);
+        const radioInput = element.querySelector(`input[value="${variantOption}"]`);
+        radioInput.checked = false;
+        radioInput.disabled = true;
+        radioInput.parentElement.classList.add(disableClass);
 
         // if variant group already has a selection
         if (hasSelection) {
