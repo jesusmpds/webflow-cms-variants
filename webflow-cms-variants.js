@@ -40,7 +40,7 @@ function init() {
   quantityInput.setAttribute("min", "1");
 
   // Remove srcset from primary image element
-  document.querySelector(fc_image).setAttribute("srcset", "");
+  imageElement.setAttribute("srcset", "");
 
   // Build variant list info into variable
   buildVariantList();
