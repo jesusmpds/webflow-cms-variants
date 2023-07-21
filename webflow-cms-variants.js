@@ -91,10 +91,11 @@ function buildVariantGroupList() {
       variantGroupElement.remove();
     } else {
       variantGroups.push({
-        element: variantGroupElement,
-        variantGroupType,
-        options: variantGroupOptions,
         customSortOrder,
+        element: variantGroupElement,
+        options: variantGroupOptions,
+        name,
+        variantGroupType,
         variantOptionDesign: variantGroupElement.querySelector(variantOptionDesign),
       });
       variantGroupElement.querySelector(variantOptionDesign).remove();
