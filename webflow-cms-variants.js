@@ -340,6 +340,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
           if (unavailableElement) {
             unavailableElement.checked = false;
             unavailableElement.parentElement.classList.add(disableClass);
+            console.log(unavailableElement?.previousElementSibling?.classList);
             unavailableElement?.previousElementSibling?.classList?.remove("w--redirected-checked");
           }
         }
