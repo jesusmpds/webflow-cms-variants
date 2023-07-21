@@ -384,7 +384,7 @@ function updateProductInfo(availableProductsPerVariant) {
       switch (key) {
         case "inventory":
           // Update max quantity
-          element.querySelector(`input[name="quantity_max"]`).value =
+          foxyForm.querySelector(`input[name="quantity_max"]`).value =
             variantSelectionCompleteProduct[key];
           //handleQuantityChange();
           break;
