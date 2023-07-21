@@ -389,6 +389,7 @@ function updateProductInfo(availableProductsPerVariant) {
           //handleQuantityChange();
           break;
         case "price":
+          console.log("price", variantSelectionCompleteProduct[key]);
           priceElement.textContent = money.format(variantSelectionCompleteProduct[key]);
           break;
         case "image":
