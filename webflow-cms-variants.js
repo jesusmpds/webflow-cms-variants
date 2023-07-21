@@ -276,6 +276,12 @@ function handleVariantSelection(e) {
   const isVariantsSelectionDone = isVariantsSelectionComplete();
   const availableProductsPerVariant = [];
 
+  // Remove disabled class from current selection
+  if (e.target.nodeName === "INPUT") {
+    e.target.parentElement.classList.remove(disableClass);
+  } else {
+  }
+
   variantItems.array.forEach(variant => {
     const currentProduct = Object.values(variant);
 
@@ -316,7 +322,6 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
       //Remove disabled
       element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
         input.parentElement.classList.remove(disableClass);
-        input.disabled = false;
       });
 
       // Remove unavailable options
@@ -324,7 +329,6 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         const variantOption = capitalizeFirstLetter(option);
         const radioInput = element.querySelector(`input[value="${variantOption}"]`);
         radioInput.checked = false;
-        radioInput.disabled = true;
         radioInput.parentElement.classList.add(disableClass);
 
         // if variant group already has a selection
