@@ -302,9 +302,6 @@ function handleVariantSelection(e) {
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
   updateProductInfo(availableProductsPerVariant);
-
-  // Update price
-  addPrice();
 }
 
 function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
