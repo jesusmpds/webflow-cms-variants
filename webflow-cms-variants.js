@@ -316,6 +316,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
       //Remove disabled
       element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
         input.parentElement.classList.remove(disableClass);
+        input.disabled = false;
       });
 
       // Remove unavailable options
