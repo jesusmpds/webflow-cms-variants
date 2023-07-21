@@ -1,7 +1,5 @@
 // Script configuration
-
 const variantGroupSettings = {
-  type: "radio", // select or radio this is required
   sortBy: "Price", // Label, Price (or leave blank for default sorting)
   sortOrder: "Ascending", //Ascending or Descending (or leave blank for default sorting)
 };
@@ -14,19 +12,25 @@ const pricingSettings = {
 // End Script Configuration
 
 // Constants and variables
+const fc_image = "[fc-image]";
+const disableClass = "fc-disable";
+const fc_variant_item = "[fc-variant-item]";
+const variantItems = { serialized: {}, array: [] };
+const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
 const quantityElement = document.querySelector("[fc-quantity]");
-const fc_image = "[fc-image]";
 const priceElement = document.querySelector("[fc-price]");
 const priceAddToCart = foxyForm.querySelector("input[name='price']");
 const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
-const fc_variant_item = "[fc-variant-item]";
 const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
-const variantItems = { serialized: {}, array: [] };
-const variantGroups = [];
-const isSelect = variantGroupSettings.type === "select";
 const money = moneyFormat(pricingSettings.locale, pricingSettings.currency);
+
 function init() {
+  //Inset disabled class styles
+  document.head.insertAdjacentHTML(
+    "beforeend",
+    "<style>.fc-disable {opacity: 0.5; !important} </style>"
+  );
   // Set quantity input defaults
   const quantityInput = foxyForm.querySelector('input[name="quantity"]');
   quantityInput.value = 1;
@@ -34,6 +38,7 @@ function init() {
 
   // Remove srcset from primary image element
   document.querySelector(fc_image).setAttribute("srcset", "");
+
   // Build variant list info into variable
   buildVariantList();
   // Build variant group list info into variable
@@ -71,8 +76,6 @@ function buildVariantList() {
 
 function buildVariantGroupList() {
   // Get variant group names, any custom sort orders if they exist, and their element design, either radio or select
-  const variantOptionDesign = isSelect ? ".w-select" : ".w-radio";
-
   variantGroupElements.forEach(variantGroupElement => {
     const name = sanitize(variantGroupElement.getAttribute("fc-variant-group"));
     const customSortOrder =
@@ -81,13 +84,15 @@ function buildVariantGroupList() {
         ?.trim()
         .split(/\s*,\s*/) ?? null;
 
+    const variantGroupType = variantGroupElementsType(variantGroupElement);
+    const variantOptionDesign = variantGroupType === "select" ? "select" : ".w-radio";
     const variantGroupOptions = getVariantGroupOptions(name);
     if (variantGroupOptions.length === 0) {
       variantGroupElement.remove();
     } else {
       variantGroups.push({
         element: variantGroupElement,
-        name,
+        variantGroupType,
         options: variantGroupOptions,
         customSortOrder,
         variantOptionDesign: variantGroupElement.querySelector(variantOptionDesign),
@@ -96,6 +101,14 @@ function buildVariantGroupList() {
     }
   });
   console.log("variantGroups", variantGroups);
+}
+
+function variantGroupElementsType(variantGroupElement) {
+  // check if the element contains a select tag or a radio tag
+  const select = variantGroupElement.querySelector("select");
+  const radio = variantGroupElement.querySelector("input[type=radio]");
+  if (select) return "select";
+  if (radio) return "radio";
 }
 
 function getVariantGroupOptions(groupName) {
@@ -210,7 +223,8 @@ function renderVariantGroups() {
   if (!variantGroups.length) return;
 
   variantGroups.forEach(variantGroup => {
-    if (isSelect) {
+    // Add select or radio to variant group container
+    if (variantGroupElementsType(variantGroup.element) === "select") {
       addSelectOptions(variantGroup);
     } else {
       addRadioOptions(variantGroup);
@@ -230,7 +244,7 @@ function addPrice() {
       .sort((a, b) => a - b);
 
     if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
-      const priceText = `${money.format(sortedPrices[0])}-${money.format(
+      const priceText = `${money.format(sortedPrices[0])} - ${money.format(
         sortedPrices[sortedPrices.length - 1]
       )}`;
       priceElement.textContent = priceText;
@@ -263,14 +277,14 @@ function handleVariantSelection(e) {
   variantItems.array.forEach(variant => {
     const currentProduct = Object.values(variant);
 
-    if (currentProduct.includes(variantSelection)) {
+    if (currentProduct.includes(variantSelection) && currentProduct.inventory) {
       availableProductsPerVariant.push(variant);
     }
   });
   console.log(availableProductsPerVariant);
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone) return; //handleQuantityChange();
 
-  //updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
+  updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
   // updateProductInfo(availableProductsPerVariant);
 
   // Update price
@@ -279,46 +293,50 @@ function handleVariantSelection(e) {
 
 function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
   const otherVariantGroups = variantGroups.filter(
-    variantGroup => variantGroup !== variantSelectionGroup
+    variantGroup => variantGroup.name !== variantSelectionGroup
   );
+  console.log("otherVariantGroups", otherVariantGroups);
 
-  otherVariantGroups.forEach(otherGroup => {
+  otherVariantGroups.forEach(otherVariantGroup => {
+    const { element, variantGroupType, name, options } = otherVariantGroup;
+    console.log("otherVariantGroup", otherVariantGroup);
+    const variantGroupName = capitalizeFirstLetter(name);
     // Check if other groups have selections
-    const otherGroupParent = element.querySelector(`#variants-${otherGroup.toLowerCase()}`);
-    let hasSelection = null;
-    if (otherGroupParent) {
-      hasSelection = element
-        .querySelector(`#variants-${otherGroup.toLowerCase()}`)
-        .classList.contains("option-selected");
-    }
+    const hasSelection = hasVariantSelection(element, variantGroupType);
 
-    //Get all values from other groups / remove all dashes
-    const otherGroupInputsValues = [];
-    element.querySelectorAll(`input[name=${otherGroup}]`).forEach(input => {
-      otherGroupInputsValues.push(input.value);
-      input.parentElement.classList.remove(RADIO_DISABLED);
-    });
+    const availableProductOptions = availableProductsPerVariant.map(e => e[name]);
 
-    const availableProductNames = availableProductsPerVariant.map(e => e[otherGroup.toLowerCase()]);
+    const unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
 
-    const unavailableOptions = otherGroupInputsValues.filter(
-      value => availableProductNames.indexOf(value) == -1
-    );
+    // Disable unavailable options for radio elements or select input elements. capitalize the values to match the DOM
 
-    unavailableOptions.forEach(option => {
-      element.querySelector(`input[value="${option}"]`).parentElement.classList.add(RADIO_DISABLED);
-    });
+    if (variantGroupType === "radio" && unavailableOptions.length !== 0) {
+      //Remove disabled
+      element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
+        input.parentElement.classList.remove(disableClass);
+      });
 
-    if (hasSelection && unavailableOptions.length !== 0) {
+      // Remove unavailable options
       unavailableOptions.forEach(option => {
-        const unavailableElement = element.querySelector(`input[value="${option}"]:checked`);
-        if (unavailableElement) {
-          unavailableElement.checked = false;
-          unavailableElement.parentElement.classList.add(RADIO_DISABLED);
-          unavailableElement.previousElementSibling.classList.remove("w--redirected-checked");
-          unavailableElement.parentElement.parentElement.classList.remove("option-selected");
+        const variantOption = capitalizeFirstLetter(option);
+        element
+          .querySelector(`input[value="${variantOption}"]`)
+          .parentElement.classList.add(disableClass);
+
+        // if variant group already has a selection
+        if (hasSelection) {
+          const unavailableElement = element.querySelector(
+            `input[value="${variantOption}"]:checked`
+          );
+          if (unavailableElement) {
+            unavailableElement.checked = false;
+            unavailableElement.parentElement.classList.add(disableClass);
+            unavailableElement.previousElementSibling.classList.remove("w--redirected-checked");
+          }
         }
       });
+    } else if (variantGroupType === "select" && unavailableOptions.length !== 0) {
+      element.querySelector("select option[disabled]").disabled = false;
     }
   });
 }
@@ -330,6 +348,22 @@ function updateProductInfo(availableProductsPerVariant) {}
 function isVariantsSelectionComplete() {
   if (foxyForm.querySelectorAll("[required]:invalid").length === 0) {
     return true;
+  }
+  return false;
+}
+
+function hasVariantSelection(variantGroupElement, variantGroupType) {
+  if (variantGroupType === "radio") {
+    if (variantGroupElement.querySelectorAll("[required]:checked").length > 0) {
+      return true;
+    }
+    return false;
+  }
+  if (variantGroupType === "select") {
+    if (variantGroupElement.querySelector("select").selectedOptions.length > 0) {
+      return true;
+    }
+    return false;
   }
   return false;
 }
