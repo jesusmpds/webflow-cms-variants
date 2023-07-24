@@ -306,6 +306,11 @@ function setInventory(isVariantsSelectionDone) {
 
 function handleVariantSelection(e) {
   const { name, nodeName, value } = e.target;
+  // Selecting the default select option returns early.
+  // The default select option is not a valid variant option.
+
+  if (!value) return;
+
   console.log("handleVariantSelection", e.target);
   const variantSelectionGroup = sanitize(name);
   const variantSelection = sanitize(value);
