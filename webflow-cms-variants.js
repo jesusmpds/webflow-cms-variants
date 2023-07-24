@@ -301,7 +301,7 @@ function setInventory(isVariantsSelectionDone) {
 }
 
 function handleVariantSelection(e) {
-  const { name, value } = e.target;
+  const { name, nodeName, value } = e.target;
   console.log("handleVariantSelection", e.target);
   const variantSelectionGroup = sanitize(name);
   const variantSelection = sanitize(value);
@@ -313,8 +313,10 @@ function handleVariantSelection(e) {
     return setInventory(isVariantsSelectionDone);
 
   // Remove disabled class from current selection
-  if (e.target.nodeName === "INPUT") {
+  if (nodeName === "INPUT") {
     e.target.parentElement.classList.remove(disableClass);
+  } else if (nodeName === "SELECT") {
+    e.target.selectedOptions[0].setAttribute("disabled", "false");
   }
 
   variantItems.array.forEach(variant => {
