@@ -262,7 +262,35 @@ function addPrice() {
   }
 }
 
-function setInventory() {
+function setInventory(isVariantsSelectionDone) {
+  if (isVariantsSelectionDone) {
+    const { inventory } =
+      variantItems.array.length === 1
+        ? variantItems.array[0]?.inventory ?? 0
+        : variantSelectionCompleteProduct;
+    const quantity = quantityElement.value;
+    const submitButton = foxyForm.querySelector("input[type=submit]");
+    inventoryElement.textContent = "Please choose options.";
+
+    if (Number(inventory) === 0 || Number(quantity) > Number(inventory)) {
+      inventoryElement.textContent = "Out of stock.";
+      inventoryElement.nextElementSibling.style.display = "none";
+
+      submitButton.disabled = true;
+      submitButton.classList.add(disableClass);
+      return;
+    }
+
+    if (Number(quantity) <= Number(inventory)) {
+      inventoryElement.textContent = inventory;
+      submitButton.disabled = false;
+      submitButton.classList.remove(disableClass);
+      return;
+    }
+    return;
+  }
+
+  // First render or variant selection not complete
   if (variantItems.array.length === 1) {
     addToCartQuantityMax.value = variantItems.array[0]?.inventory ?? 0;
     return;
@@ -284,10 +312,12 @@ function handleVariantSelection(e) {
   const isVariantsSelectionDone = isVariantsSelectionComplete();
   const availableProductsPerVariant = [];
 
+  if (variantSelectionGroup === "quantity" && isVariantsSelectionDone)
+    return setInventory(isVariantsSelectionDone);
+
   // Remove disabled class from current selection
   if (e.target.nodeName === "INPUT") {
     e.target.parentElement.classList.remove(disableClass);
-  } else {
   }
 
   variantItems.array.forEach(variant => {
@@ -298,7 +328,6 @@ function handleVariantSelection(e) {
     }
   });
   console.log(availableProductsPerVariant);
-  if (variantSelectionGroup === "quantity" && isVariantsSelectionDone) return; //handleQuantityChange();
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
   updateProductInfo(availableProductsPerVariant);
@@ -356,7 +385,8 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
 }
 
 function updateProductInfo(availableProductsPerVariant) {
-  if (isVariantsSelectionComplete()) {
+  const isVariantsSelectionDone = isVariantsSelectionComplete();
+  if (isVariantsSelectionDone) {
     // Save the selected product variant
     let selectedProductVariant = {};
     foxyForm.querySelectorAll("input:checked").forEach(variant => {
@@ -383,7 +413,8 @@ function updateProductInfo(availableProductsPerVariant) {
           // Update max quantity
           foxyForm.querySelector(`input[name="quantity_max"]`).value =
             variantSelectionCompleteProduct[key];
-          //handleQuantityChange();
+          // Update inventory element
+          setInventory(isVariantsSelectionDone);
           break;
         case "price":
           console.log("price", variantSelectionCompleteProduct[key]);

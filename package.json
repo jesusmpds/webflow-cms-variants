@@ -1,0 +1,14 @@
+{
+  "name": "webflow",
+  "version": "1.0.0",
+  "description": "For image change functionality the main product image needs to have the custom attribute: fc-image=\"\"",
+  "main": "webflow-cms-variants.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.45.0"
+  }
+}
