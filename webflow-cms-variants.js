@@ -1,5 +1,6 @@
 // Script configuration
 const variantGroupSettings = {
+  selectOptionDefaultLabel: "Select and option...", // Label for the default option (or leave blank for default label)
   sortBy: "Price", // Label, Price (or leave blank for default sorting)
   sortOrder: "Ascending", //Ascending or Descending (or leave blank for default sorting)
 };
@@ -205,12 +206,15 @@ function renderVariantGroups() {
   };
   const addSelectOptions = variantGroup => {
     const { element, name, options, customSortOrder, variantOptionDesign } = variantGroup;
+    if (!variantGroupSettings.selectOptionDefaultLabel) {
+      variantGroupSettings.selectOptionDefaultLabel = "Select an option";
+    }
     const variantOptions = customSortOrder ? customSortOrder : options;
     let variantSelect = variantOptionDesign.cloneNode(true);
 
     variantSelect.required = true;
     variantSelect.name = capitalizeFirstLetter(name);
-
+    variantSelect.add(new Option(variantGroupSettings.selectOptionDefaultLabel, ""));
     console.log("variantOptions", variantOptions);
 
     variantOptions.forEach(option => {
@@ -316,7 +320,7 @@ function handleVariantSelection(e) {
   if (nodeName === "INPUT") {
     e.target.parentElement.classList.remove(disableClass);
   } else if (nodeName === "SELECT") {
-    e.target.selectedOptions[0].setAttribute("disabled", "false");
+    e.target.querySelector("option[disabled]")?.removeAttribute("disabled");
   }
 
   variantItems.array.forEach(variant => {
@@ -378,7 +382,19 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         }
       });
     } else if (variantGroupType === "select" && unavailableOptions.length !== 0) {
-      element.querySelector("select option[disabled]")?.setAttribute("disabled", false);
+      element.querySelector("select option[disabled]")?.removeAttribute("disabled");
+
+      // Remove unavailable options
+      unavailableOptions.forEach(option => {
+        const variantOption = capitalizeFirstLetter(option);
+        const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
+        selectOption.setAttribute("disabled", "true");
+
+        // if variant group already has a selection
+        if (hasSelection) {
+          element.querySelector(`select`).selectedIndex = 0;
+        }
+      });
     }
   });
 }
@@ -450,7 +466,7 @@ function hasVariantSelection(variantGroupElement, variantGroupType) {
     return false;
   }
   if (variantGroupType === "select") {
-    if (variantGroupElement.querySelector("select").selectedOptions.length > 0) {
+    if (variantGroupElement.querySelector("select").selectedOptions[0].value) {
       return true;
     }
     return false;
