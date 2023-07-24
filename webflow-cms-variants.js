@@ -35,9 +35,8 @@ function init() {
     "<style>.fc-disable {opacity: 0.5; !important} </style>"
   );
   // Set quantity input defaults
-  const quantityInput = foxyForm.querySelector('input[name="quantity"]');
-  quantityInput.value = 1;
-  quantityInput.setAttribute("min", "1");
+  quantityElement.value = 1;
+  quantityElement.setAttribute("min", "1");
 
   // Remove srcset from primary image element
   imageElement.setAttribute("srcset", "");
@@ -228,7 +227,7 @@ function renderVariantGroups() {
 
   variantGroups.forEach(variantGroup => {
     // Add select or radio to variant group container
-    if (variantGroupElementsType(variantGroup.element) === "select") {
+    if (variantGroup.variantGroupType === "select") {
       addSelectOptions(variantGroup);
     } else {
       addRadioOptions(variantGroup);
