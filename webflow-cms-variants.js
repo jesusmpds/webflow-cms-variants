@@ -274,8 +274,6 @@ function setInventory(isVariantsSelectionDone) {
 
     if (Number(inventory) === 0 || Number(quantity) > Number(inventory)) {
       inventoryElement.textContent = "Out of stock.";
-      inventoryElement.nextElementSibling.style.display = "none";
-
       submitButton.disabled = true;
       submitButton.classList.add(disableClass);
       return;
