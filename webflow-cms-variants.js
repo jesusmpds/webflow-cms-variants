@@ -20,7 +20,7 @@ const variantItems = { serialized: {}, array: [] };
 const variantGroups = [];
 const foxyForm = document.querySelector("[fc-form]");
 const imageElement = document.querySelector("[fc-image]");
-const quantityElement = document.querySelector("[fc-quantity]");
+const quantityElement = foxyForm.querySelector("input[name='quantity']");
 const priceElement = document.querySelector("[fc-price]");
 const inventoryElement = document.querySelector("[fc-stock]");
 const priceAddToCart = foxyForm.querySelector("input[name='price']");
