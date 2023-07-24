@@ -376,7 +376,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         }
       });
     } else if (variantGroupType === "select" && unavailableOptions.length !== 0) {
-      element.querySelector("select option[disabled]").disabled = false;
+      element.querySelector("select option[disabled]")?.setAttribute("disabled", false);
     }
   });
 }
