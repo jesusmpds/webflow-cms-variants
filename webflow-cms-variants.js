@@ -404,7 +404,9 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         });
       }
     } else if (variantGroupType === "select") {
-      element.querySelector(`select option.${disableClass}`)?.classList.remove(disableClass);
+      element.querySelectorAll(`select option.${disableClass}`).forEach(option => {
+        option.classList.remove(disableClass);
+      });
 
       if (unavailableOptions.length !== 0) {
         // Add disabled class to unavailable options
