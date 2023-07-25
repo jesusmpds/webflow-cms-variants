@@ -313,7 +313,8 @@ function handleVariantSelection(e) {
 
   console.log("handleVariantSelection", e.target);
   const variantSelectionGroup = sanitize(name);
-
+  const variantSelection = sanitize(value);
+  const availableProductsPerVariant = [];
   const isVariantsSelectionDone = isVariantsSelectionComplete();
 
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone)
@@ -326,33 +327,16 @@ function handleVariantSelection(e) {
     e.target.querySelector(`option.${disableClass}`)?.classList.remove(disableClass);
   }
 
-  // Save the selected product variants
-  foxyForm
-    .querySelectorAll("input:checked, select[required]:valid option:checked, option:checked")
-    .forEach(variant => {
-      // If option selected is default option.value === "", return early
-      if (!variant.value) return;
-
-      if (variant.nodeName === "OPTION") {
-        selectedProductVariants[sanitize(variant.parentElement.name)] = sanitize(variant.value);
-        return;
-      }
-      selectedProductVariants[sanitize(variant.name)] = sanitize(variant.value);
-    });
-
-  const availableProductsPerVariant = variantItems.array.filter(variant => {
-    let isProduct = [];
-    Object.keys(selectedProductVariants).forEach(variantOptionKey => {
-      variant[variantOptionKey] === selectedProductVariants[variantOptionKey]
-        ? isProduct.push(true)
-        : isProduct.push(false);
-    });
-    return isProduct.every(productCheck => productCheck === true) && Number(variant.inventory) > 0;
+  variantItems.array.forEach(variant => {
+    const currentProduct = Object.values(variant);
+    if (currentProduct.includes(variantSelection) && Number(variant.inventory) > 0) {
+      availableProductsPerVariant.push(variant);
+    }
   });
   console.log("availableProductsPerVariant", availableProductsPerVariant);
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
-  updateProductInfo(availableProductsPerVariant, selectedProductVariants);
+  updateProductInfo(availableProductsPerVariant);
 }
 
 function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
@@ -426,16 +410,27 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
   });
 }
 
-function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
+function updateProductInfo(availableProductsPerVariant) {
   const isVariantsSelectionDone = isVariantsSelectionComplete();
   if (isVariantsSelectionDone) {
+    // Save the selected product variant
+    let selectedProductVariant = {};
+    foxyForm
+      .querySelectorAll("input:checked, select[required]:valid option:checked, option:checked")
+      .forEach(variant => {
+        // If option selected is default option.value === "", return early
+        if (!variant.value) return;
+        if (variant.nodeName === "OPTION") {
+          selectedProductVariant[sanitize(variant.parentElement.name)] = sanitize(variant.value);
+          return;
+        }
+        selectedProductVariant[sanitize(variant.name)] = sanitize(variant.value);
+      });
     // Find Selected Product Variant Total Information
     variantSelectionCompleteProduct = availableProductsPerVariant.find(product => {
       let isProduct = [];
-      Object.keys(selectedProductVariants).forEach(key => {
-        product[key] === selectedProductVariants[key]
-          ? isProduct.push(true)
-          : isProduct.push(false);
+      Object.keys(selectedProductVariant).forEach(key => {
+        product[key] === selectedProductVariant[key] ? isProduct.push(true) : isProduct.push(false);
       });
       return isProduct.every(productCheck => productCheck === true);
     });
