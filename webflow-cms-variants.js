@@ -33,7 +33,7 @@ function init() {
   //Insert disabled class styles
   document.head.insertAdjacentHTML(
     "beforeend",
-    "<style>.fc-disable {opacity: 0.5 !important} </style>"
+    "<style>.fc-disable {opacity: 0.5 !important; color: #808080; } </style>"
   );
   // Set quantity input defaults
   quantityElement.value = 1;
@@ -323,7 +323,7 @@ function handleVariantSelection(e) {
   if (nodeName === "INPUT") {
     e.target.parentElement.classList.remove(disableClass);
   } else if (nodeName === "SELECT") {
-    e.target.querySelector("option[disabled]")?.removeAttribute("disabled");
+    e.target.querySelector(`option.${disableClass}`)?.classList.remove(disableClass);
   }
 
   // Save the selected product variants
@@ -404,7 +404,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         });
       }
     } else if (variantGroupType === "select") {
-      element.querySelector("select option[disabled]")?.removeAttribute("disabled");
+      element.querySelector(`select option.${disableClass}`)?.classList.remove(disableClass);
 
       if (unavailableOptions.length !== 0) {
         // Add disabled class to unavailable options
@@ -412,7 +412,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
           const variantOption = capitalizeFirstLetter(option);
           const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
           const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
-          selectOption.setAttribute("disabled", "true");
+          selectOption.classList.add(disableClass);
 
           // if variant group already has a selection
           if (hasSelection && selectedOptionValue === variantOption) {
