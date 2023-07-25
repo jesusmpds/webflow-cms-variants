@@ -30,10 +30,10 @@ const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
 const money = moneyFormat(pricingSettings.locale, pricingSettings.currency);
 
 function init() {
-  //Inset disabled class styles
+  //Insert disabled class styles
   document.head.insertAdjacentHTML(
     "beforeend",
-    "<style>.fc-disable {opacity: 0.5; !important} </style>"
+    "<style>.fc-disable {opacity: 0.5 !important} </style>"
   );
   // Set quantity input defaults
   quantityElement.value = 1;
@@ -375,46 +375,51 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
 
     // Disable unavailable options for radio elements or select input elements. capitalize the values to match the DOM
 
-    if (variantGroupType === "radio" && unavailableOptions.length !== 0) {
+    if (variantGroupType === "radio") {
       //Remove disabled
       element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
         input.parentElement.classList.remove(disableClass);
       });
+      if (unavailableOptions.length !== 0) {
+        // Add disabled class to unavailable options
+        unavailableOptions.forEach(option => {
+          const variantOption = capitalizeFirstLetter(option);
+          const radioInput = element.querySelector(`input[value="${variantOption}"]`);
+          radioInput.parentElement.classList.add(disableClass);
 
-      // Add disabled class to unavailable options
-      unavailableOptions.forEach(option => {
-        const variantOption = capitalizeFirstLetter(option);
-        const radioInput = element.querySelector(`input[value="${variantOption}"]`);
-        radioInput.parentElement.classList.add(disableClass);
-
-        // if variant group already has a selection
-        if (hasSelection) {
-          const unavailableElement = element.querySelector(
-            `input[value="${variantOption}"]:checked`
-          );
-          if (unavailableElement) {
-            unavailableElement.checked = false;
-            unavailableElement.parentElement.classList.add(disableClass);
-            console.log(unavailableElement?.previousElementSibling?.classList);
-            unavailableElement?.previousElementSibling?.classList?.remove("w--redirected-checked");
+          // if variant group already has a selection
+          if (hasSelection) {
+            const unavailableElement = element.querySelector(
+              `input[value="${variantOption}"]:checked`
+            );
+            if (unavailableElement) {
+              unavailableElement.checked = false;
+              unavailableElement.parentElement.classList.add(disableClass);
+              console.log(unavailableElement?.previousElementSibling?.classList);
+              unavailableElement?.previousElementSibling?.classList?.remove(
+                "w--redirected-checked"
+              );
+            }
           }
-        }
-      });
-    } else if (variantGroupType === "select" && unavailableOptions.length !== 0) {
+        });
+      }
+    } else if (variantGroupType === "select") {
       element.querySelector("select option[disabled]")?.removeAttribute("disabled");
 
-      // Remove unavailable options
-      unavailableOptions.forEach(option => {
-        const variantOption = capitalizeFirstLetter(option);
-        const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
-        const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
-        selectOption.setAttribute("disabled", "true");
+      if (unavailableOptions.length !== 0) {
+        // Add disabled class to unavailable options
+        unavailableOptions.forEach(option => {
+          const variantOption = capitalizeFirstLetter(option);
+          const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
+          const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
+          selectOption.setAttribute("disabled", "true");
 
-        // if variant group already has a selection
-        if (hasSelection && selectedOptionValue === variantOption) {
-          element.querySelector(`select`).selectedIndex = 0;
-        }
-      });
+          // if variant group already has a selection
+          if (hasSelection && selectedOptionValue === variantOption) {
+            element.querySelector(`select`).selectedIndex = 0;
+          }
+        });
+      }
     }
   });
 }
@@ -458,7 +463,6 @@ function updateProductInfo(availableProductsPerVariant, selectedProductVariants)
     });
     return;
   }
-
   // Not variant selection complete
   addPrice();
 
