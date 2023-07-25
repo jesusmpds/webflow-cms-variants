@@ -332,7 +332,7 @@ function handleVariantSelection(e) {
 
   console.log("availableProductsPerVariant", availableProductsPerVariant);
 
-  updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
+  updateVariantOptions(availableProductsPerVariant, variantSelectionGroup, currentVariantSelection);
   updateProductInfo(availableProductsPerVariant, selectedProductVariants);
 }
 
@@ -381,7 +381,11 @@ function getAvailableProductsPerVariantSelection(currentVariantSelection, select
   }
 }
 
-function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
+function updateVariantOptions(
+  availableProductsPerVariant,
+  variantSelectionGroup,
+  currentVariantSelection
+) {
   const otherVariantGroups = variantGroups.filter(
     variantGroup => variantGroup.name !== variantSelectionGroup
   );
@@ -425,6 +429,15 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
               unavailableElement?.previousElementSibling?.classList?.remove(
                 "w--redirected-checked"
               );
+              const selectedProductVariants = getSelectedVariantOptions();
+
+              console.log("selectedProductVariants Inside Radio", selectedProductVariants);
+
+              const availableProductsPerVariant = getAvailableProductsPerVariantSelection(
+                currentVariantSelection,
+                selectedProductVariants
+              );
+              updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
             }
           }
         });
@@ -445,6 +458,15 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
           // if variant group already has a selection
           if (hasSelection && selectedOptionValue === variantOption) {
             element.querySelector(`select`).selectedIndex = 0;
+            const selectedProductVariants = getSelectedVariantOptions();
+
+            console.log("selectedProductVariants inside Select", selectedProductVariants);
+
+            const availableProductsPerVariant = getAvailableProductsPerVariantSelection(
+              currentVariantSelection,
+              selectedProductVariants
+            );
+            updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
           }
         });
       }
