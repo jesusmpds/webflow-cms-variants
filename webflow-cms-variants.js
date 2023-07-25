@@ -306,17 +306,15 @@ function setInventory(isVariantsSelectionDone) {
 
 function handleVariantSelection(e) {
   const { name, nodeName, value } = e.target;
+  const selectedProductVariants = {};
   // Selecting the default select option returns early.
   // The default select option is not a valid variant option.
-
   if (!value) return;
 
   console.log("handleVariantSelection", e.target);
   const variantSelectionGroup = sanitize(name);
-  const variantSelection = sanitize(value);
 
   const isVariantsSelectionDone = isVariantsSelectionComplete();
-  const availableProductsPerVariant = [];
 
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone)
     return setInventory(isVariantsSelectionDone);
@@ -328,17 +326,33 @@ function handleVariantSelection(e) {
     e.target.querySelector("option[disabled]")?.removeAttribute("disabled");
   }
 
-  variantItems.array.forEach(variant => {
-    const currentProduct = Object.values(variant);
+  // Save the selected product variants
+  foxyForm
+    .querySelectorAll("input:checked, select[required]:valid option:checked, option:checked")
+    .forEach(variant => {
+      // If option selected is default option.value === "", return early
+      if (!variant.value) return;
 
-    if (currentProduct.includes(variantSelection) && Number(variant.inventory) > 0) {
-      availableProductsPerVariant.push(variant);
-    }
+      if (variant.nodeName === "OPTION") {
+        selectedProductVariants[sanitize(variant.parentElement.name)] = sanitize(variant.value);
+        return;
+      }
+      selectedProductVariants[sanitize(variant.name)] = sanitize(variant.value);
+    });
+
+  const availableProductsPerVariant = variantItems.array.filter(variant => {
+    let isProduct = [];
+    Object.keys(selectedProductVariants).forEach(variantOptionKey => {
+      variant[variantOptionKey] === selectedProductVariants[variantOptionKey]
+        ? isProduct.push(true)
+        : isProduct.push(false);
+    });
+    return isProduct.every(productCheck => productCheck === true) && Number(variant.inventory) > 0;
   });
-  console.log(availableProductsPerVariant);
+  console.log("availableProductsPerVariant", availableProductsPerVariant);
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
-  updateProductInfo(availableProductsPerVariant);
+  updateProductInfo(availableProductsPerVariant, selectedProductVariants);
 }
 
 function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
@@ -367,7 +381,7 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
         input.parentElement.classList.remove(disableClass);
       });
 
-      // Remove unavailable options
+      // Add disabled class to unavailable options
       unavailableOptions.forEach(option => {
         const variantOption = capitalizeFirstLetter(option);
         const radioInput = element.querySelector(`input[value="${variantOption}"]`);
@@ -393,10 +407,11 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
       unavailableOptions.forEach(option => {
         const variantOption = capitalizeFirstLetter(option);
         const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
+        const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
         selectOption.setAttribute("disabled", "true");
 
         // if variant group already has a selection
-        if (hasSelection) {
+        if (hasSelection && selectedOptionValue === variantOption) {
           element.querySelector(`select`).selectedIndex = 0;
         }
       });
@@ -404,20 +419,16 @@ function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup
   });
 }
 
-function updateProductInfo(availableProductsPerVariant) {
+function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
   const isVariantsSelectionDone = isVariantsSelectionComplete();
   if (isVariantsSelectionDone) {
-    // Save the selected product variant
-    let selectedProductVariant = {};
-    foxyForm.querySelectorAll("input:checked").forEach(variant => {
-      selectedProductVariant[sanitize(variant.name)] = sanitize(variant.value);
-    });
-
     // Find Selected Product Variant Total Information
     variantSelectionCompleteProduct = availableProductsPerVariant.find(product => {
       let isProduct = [];
-      Object.keys(selectedProductVariant).forEach(key => {
-        product[key] === selectedProductVariant[key] ? isProduct.push(true) : isProduct.push(false);
+      Object.keys(selectedProductVariants).forEach(key => {
+        product[key] === selectedProductVariants[key]
+          ? isProduct.push(true)
+          : isProduct.push(false);
       });
       return isProduct.every(productCheck => productCheck === true);
     });
