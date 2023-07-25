@@ -134,7 +134,6 @@ function getVariantGroupOptions(groupName) {
   });
 
   sortOptions(variantGroupOptions);
-  console.log("variantGroupOptions", variantGroupOptions);
   return variantGroupOptions.map(option => option.variantOption);
 }
 
@@ -215,7 +214,6 @@ function renderVariantGroups() {
     variantSelect.required = true;
     variantSelect.name = capitalizeFirstLetter(name);
     variantSelect.add(new Option(variantGroupSettings.selectOptionDefaultLabel, ""));
-    console.log("variantOptions", variantOptions);
 
     variantOptions.forEach(option => {
       const selectOption = capitalizeFirstLetter(option);
@@ -310,12 +308,10 @@ function handleVariantSelection(e) {
   // The default select option is not a valid variant option.
   if (!value) return;
 
-  console.log("handleVariantSelection", e.target);
   const variantSelectionGroup = sanitize(name);
   const variantSelection = sanitize(value);
-  const availableProductsPerVariant = [];
+  let availableProductsPerVariant = [];
   const isVariantsSelectionDone = isVariantsSelectionComplete();
-
   if (variantSelectionGroup === "quantity" && isVariantsSelectionDone)
     return setInventory(isVariantsSelectionDone);
 
@@ -325,6 +321,20 @@ function handleVariantSelection(e) {
   } else if (nodeName === "SELECT") {
     e.target.querySelector(`option.${disableClass}`)?.classList.remove(disableClass);
   }
+
+  const selectedProductVariants = getSelectedVariantOptions();
+
+  console.log("selectedProductVariants", selectedProductVariants);
+
+  // availableProductsPerVariant = variantItems.array.filter(variant => {
+  //   let isProduct = [];
+  //   Object.keys(selectedProductVariants).forEach(variantOptionKey => {
+  //     variant[variantOptionKey] === selectedProductVariants[variantOptionKey]
+  //       ? isProduct.push(true)
+  //       : isProduct.push(false);
+  //   });
+  //   return isProduct.every(productCheck => productCheck === true) && Number(variant.inventory) > 0;
+  // });
 
   variantItems.array.forEach(variant => {
     const currentProduct = Object.values(variant);
@@ -336,6 +346,23 @@ function handleVariantSelection(e) {
 
   updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
   updateProductInfo(availableProductsPerVariant);
+}
+
+function getSelectedVariantOptions() {
+  // Save the selected product variants
+  const selectedProductVariants = {};
+  foxyForm
+    .querySelectorAll("input:checked, select[required]:valid option:checked, option:checked")
+    .forEach(variant => {
+      // If option selected is default option.value === "", return early
+      if (!variant.value) return;
+      if (variant.nodeName === "OPTION") {
+        selectedProductVariants[sanitize(variant.parentElement.name)] = sanitize(variant.value);
+        return;
+      }
+      selectedProductVariants[sanitize(variant.name)] = sanitize(variant.value);
+    });
+  return selectedProductVariants;
 }
 
 function updateVariantOptions(availableProductsPerVariant, variantSelectionGroup) {
