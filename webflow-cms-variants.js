@@ -306,7 +306,6 @@ function setInventory(isVariantsSelectionDone) {
 
 function handleVariantSelection(e) {
   const { name, nodeName, value } = e.target;
-  const selectedProductVariants = {};
   // Selecting the default select option returns early.
   // The default select option is not a valid variant option.
   if (!value) return;
