@@ -16,7 +16,7 @@ Inside of the add to cart form, user will add a div for each variant group and a
 
 User will add a hidden Collection List using the referenced variants as the source.
 
-On the Collection Item the user will include a custom attribute: fc-variant-item="", and the corresponding data attributes for each needed variant attribute (ie: label, price, inventory, etc.) with the following format, e.g:
+On the Collection Item the user will include a custom attribute: `fc-variant-item=""`, and the corresponding data attributes for each needed variant attribute (ie: label, price, inventory, etc.) with the following format, e.g:
 
 `fc-variant-color= {{Color}}`
 
