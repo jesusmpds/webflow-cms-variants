@@ -390,6 +390,7 @@ function updateVariantOptions(
     variantGroup => variantGroup.name !== variantSelectionGroup
   );
   console.log("otherVariantGroups", otherVariantGroups);
+  let variantGroupsStateChange = false;
 
   otherVariantGroups.forEach(otherVariantGroup => {
     const { element, variantGroupType, name, options } = otherVariantGroup;
@@ -429,15 +430,6 @@ function updateVariantOptions(
               unavailableElement?.previousElementSibling?.classList?.remove(
                 "w--redirected-checked"
               );
-              const selectedProductVariants = getSelectedVariantOptions();
-
-              console.log("selectedProductVariants Inside Radio", selectedProductVariants);
-
-              const availableProductsPerVariant = getAvailableProductsPerVariantSelection(
-                currentVariantSelection,
-                selectedProductVariants
-              );
-              updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
             }
           }
         });
@@ -458,20 +450,24 @@ function updateVariantOptions(
           // if variant group already has a selection
           if (hasSelection && selectedOptionValue === variantOption) {
             element.querySelector(`select`).selectedIndex = 0;
-            const selectedProductVariants = getSelectedVariantOptions();
-
-            console.log("selectedProductVariants inside Select", selectedProductVariants);
-
-            const availableProductsPerVariant = getAvailableProductsPerVariantSelection(
-              currentVariantSelection,
-              selectedProductVariants
-            );
-            updateVariantOptions(availableProductsPerVariant, variantSelectionGroup);
           }
         });
       }
     }
   });
+
+  // Update variant groups state
+  if (variantGroupsStateChange) {
+    const selectedProductVariants = getSelectedVariantOptions();
+
+    console.log("selectedProductVariants inside Select", selectedProductVariants);
+
+    const availableProductsStateChange = getAvailableProductsPerVariantSelection(
+      currentVariantSelection,
+      selectedProductVariants
+    );
+    updateVariantOptions(availableProductsStateChange, variantSelectionGroup);
+  }
 }
 
 function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
