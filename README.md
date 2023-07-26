@@ -1,8 +1,12 @@
-## Configuration
+# Configuration
 
 For image change functionality the main product image needs to have the custom attribute: fc-image=""
 
 For real time price change on variant selection the price element must have the custom attribute: fc-price=""
+
+For stock change functionality the stock element needs to have the custom element:
+
+fc-stock=""
 
 User will add a custom attribute to the form on the Product CMS page with the value:
 
@@ -20,11 +24,11 @@ fc-variant-group-order={{Sizes}}
 
 Sizes being a field on the Product CMS that has a comma separated list of values, e.g:
 
-"Small, Medium, Large"
+"Small,Medium,Large"
 
-User will add a hidden collection list using the referenced variants as the source.
+User will add a hidden Collection List using the referenced variants as the source.
 
-On the Collection Item the user will include a custom attribute: fc-variant-item="", and the corresponding data attributes for each needed attribute (ie: label, price, inventory, etc.) with the following format, e.g:
+On the Collection Item the user will include a custom attribute: fc-variant-item="", and the corresponding data attributes for each needed variant attribute (ie: label, price, inventory, etc.) with the following format, e.g:
 
 fc-variant-color= {{Color}}
 fc-variant-size={{Size}}
