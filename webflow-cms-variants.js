@@ -405,7 +405,6 @@ function updateVariantOptions(
     console.log("unavailableOptions", unavailableOptions);
 
     // Disable unavailable options for radio elements or select input elements. capitalize the values to match the DOM
-
     if (variantGroupType === "radio") {
       //Remove disabled
       element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
@@ -430,6 +429,7 @@ function updateVariantOptions(
               unavailableElement?.previousElementSibling?.classList?.remove(
                 "w--redirected-checked"
               );
+              variantGroupsStateChange = true;
             }
           }
         });
@@ -450,6 +450,7 @@ function updateVariantOptions(
           // if variant group already has a selection
           if (hasSelection && selectedOptionValue === variantOption) {
             element.querySelector(`select`).selectedIndex = 0;
+            variantGroupsStateChange = true;
           }
         });
       }
