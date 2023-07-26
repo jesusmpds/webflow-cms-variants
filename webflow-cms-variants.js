@@ -75,6 +75,10 @@ const pricingSettings = {
         }
         return acc;
       }, {});
+
+      // Add image to variant data
+      variant.image = variantItem.querySelector("image")?.src;
+
       variantItems.serialized[variant.code] = filterEmpty(variant);
       variantItems.array.push(filterEmpty(variant));
     });

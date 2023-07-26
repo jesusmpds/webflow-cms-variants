@@ -35,3 +35,5 @@ fc-variant-size={{Size}}
 fc-variant-inventory={{Inventory}}
 
 Where {{Color}} for example is the field data from the product variant.
+
+Inside the Collection Item add a Webflow Image element and connect it to the image from your variant. This is the only variant data that needs to be added this way.
