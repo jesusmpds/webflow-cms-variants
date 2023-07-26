@@ -77,7 +77,7 @@ const pricingSettings = {
       }, {});
 
       // Add image to variant data
-      variant.image = variantItem.querySelector("image")?.src;
+      variant.image = variantItem.querySelector("img")?.src;
 
       variantItems.serialized[variant.code] = filterEmpty(variant);
       variantItems.array.push(filterEmpty(variant));
