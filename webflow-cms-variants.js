@@ -1,6 +1,6 @@
 // Script configuration
 const variantGroupSettings = {
-  selectOptionDefaultLabel: "Select and option...", // Label for the default option (or leave blank for default label)
+  selectOptionDefaultLabel: "Select an option...", // Label for the default option (or leave blank for default label)
   sortBy: "Price", // Label, Price (or leave blank for default sorting)
   sortOrder: "Ascending", //Ascending or Descending (or leave blank for default sorting)
 };
@@ -33,7 +33,7 @@ function init() {
   //Insert disabled class styles
   document.head.insertAdjacentHTML(
     "beforeend",
-    "<style>.fc-disable {opacity: 0.5 !important; color: #808080; } </style>"
+    "<style>.fc-disable:not([type=submit]) {opacity: 0.5 !important; color: #808080; } </style>"
   );
   // Set quantity input defaults
   quantityElement.value = 1;
