@@ -324,7 +324,7 @@ const config = {
     if (!value) return;
 
     // Selecting or making a change to a input or select outside a variant group won't work
-    if (!targetElement.closest(`div${foxy_variant_group}`)) return;
+    if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
 
     const variantSelectionGroup = sanitize(name);
     const currentVariantSelection = sanitize(value);
