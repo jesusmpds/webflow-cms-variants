@@ -216,10 +216,8 @@ const config = {
 
       const variantOptions = customSortOrder ? customSortOrder : options;
       let variantSelect = variantOptionDesign.cloneNode(true);
-      const optionText = variantSelect.querySelector("option");
       variantSelect.required = true;
       variantSelect.name = capitalizeFirstLetter(name);
-      variantSelect.add(new Option(optionText.textContent, ""));
 
       variantOptions.forEach(option => {
         const selectOption = capitalizeFirstLetter(option);
