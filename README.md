@@ -4,25 +4,25 @@
 
 User will add a custom attribute to the form on the Product CMS page with the value:
 
-`fc-form=""`
+`foxy-form=""`
 
 ### Variant Options
 
 Inside of the add to cart form, user will add a div for each variant group and apply the specified data attribute for each variant group, in the format:
 
-`fc-variant-group={{Color}}`
+`foxy-variant-group={{Color}}`
 
-`fc-variant-group={{Size}}`
+`foxy-variant-group={{Size}}`
 
 User will add a hidden Collection List using the referenced variants as the source.
 
-On the Collection Item the user will include a custom attribute: `fc-variant-item=""`, and the corresponding data attributes for each needed variant attribute (ie: label, price, inventory, etc.) with the following format, e.g:
+On the Collection Item the user will include a custom attribute: `foxy-variant-item=""`, and the corresponding data attributes for each needed variant attribute (ie: label, price, inventory, etc.) with the following format, e.g:
 
-`fc-variant-color= {{Color}}`
+`foxy-variant-color= {{Color}}`
 
-`fc-variant-size={{Size}}`
+`foxy-variant-size={{Size}}`
 
-`fc-variant-inventory={{Inventory}}`
+`foxy-variant-inventory={{Inventory}}`
 
 Where `{{Color}}` for example is the field data from the product variant.
 
@@ -32,7 +32,7 @@ Inside the Collection Item add a Webflow Image element and connect it to the ima
 
 If the user wants to set a specific order for the variant group values of a variant group, add a custom attribute in the format:
 
-`fc-variant-group-order={{Sizes}}`
+`foxy-variant-group-order={{Sizes}}`
 
 Sizes being a field on the Product CMS that has a comma separated list of values, e.g:
 
@@ -42,19 +42,19 @@ Sizes being a field on the Product CMS that has a comma separated list of values
 
 For image change functionality the main product image needs to have the custom attribute:
 
-`fc-image=""`
+`foxy-image=""`
 
 ## Price
 
 For real time price change on variant selection the price element must have the custom attribute:
 
-`fc-price=""`
+`foxy-price=""`
 
 ## Stock
 
 For stock change functionality the stock element needs to have the custom element:
 
-`fc-stock=""`
+`foxy-stock=""`
 
 ## Script Configurations
 

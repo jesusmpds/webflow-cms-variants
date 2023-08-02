@@ -1,50 +1,48 @@
 // Script configuration
-const variantGroupSettings = {
-  selectOptionDefaultLabel: "Select an option...", // Label for the default option (or leave blank for default label)
-  sortBy: "Price", // Label, Price (or leave blank for default sorting)
-  sortOrder: "Ascending", //Ascending or Descending (or leave blank for default sorting)
-};
-
-const pricingSettings = {
+// config
+const config = {
+  sortBy: "price", // label, price (or leave blank for default sorting)
+  sortOrder: "ascending", //ascending or descending (or leave blank for default sorting)
   locale: "en-US", // The language used by and regional preference of the user
   currency: "USD", // The currency for the price elements on the page
+  priceElementDisplay: "", //Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
+  inventoryDefaultLabel: "Please choose options", // If using an inventory element, add the text that you want to show when the product has variants, before variant selection is completed. Or leave blank for default.
 };
 
 // End Script Configuration
 
 (() => {
   // Constants and variables
-  const disableClass = "fc-disable";
-  const disableOptionClass = "fc-disable-option";
-  const fc_variant_item = "[fc-variant-item]";
+  const disableClass = "foxy-disable";
+  const disableOptionClass = "foxy-disable-option";
+  const foxy_variant_group = "foxy-variant-group";
+  const foxy_variant_group_order = "foxy-variant-group-order";
+  const foxy_variant_item = "[foxy-variant-item]";
   let variantSelectionCompleteProduct;
   const variantItems = { serialized: {}, array: [] };
   const variantGroups = [];
-  const foxyForm = document.querySelector("[fc-form]");
-  const imageElement = document.querySelector("[fc-image]");
+  const foxyForm = document.querySelector("[foxy-form]");
+  const imageElement = document.querySelector("[foxy-image]");
   const quantityElement = foxyForm.querySelector("input[name='quantity']");
-  const priceElement = document.querySelector("[fc-price]");
-  const inventoryElement = document.querySelector("[fc-stock]");
+  const priceElement = document.querySelector("[foxy-price]");
+  const inventoryElement = document.querySelector("[foxy-inventory]");
   const priceAddToCart = foxyForm.querySelector("input[name='price']");
   const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
-  const variantGroupElements = foxyForm.querySelectorAll("[fc-variant-group]");
-  const money = moneyFormat(pricingSettings.locale, pricingSettings.currency);
+  const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
+  const money = moneyFormat(config.locale, config.currency);
 
   function init() {
     //Insert disabled class styles
     document.head.insertAdjacentHTML(
       "beforeend",
       `<style>
-    .fc-disable {opacity: 0.5 !important; color: #808080; }  
-    .fc-disable-option {color: #808080 !important; } 
+    .${disableClass} {opacity: 0.5 !important; }  
+    .${disableOptionClass} {color: #808080 !important; } 
     </style>`
     );
     // Set quantity input defaults
     quantityElement.value = 1;
     quantityElement.setAttribute("min", "1");
-
-    // Remove srcset from primary image element
-    imageElement?.setAttribute("srcset", "");
 
     // Build variant list info into variable
     buildVariantList();
@@ -62,14 +60,16 @@ const pricingSettings = {
   }
 
   function buildVariantList() {
-    const variantList = document.querySelectorAll(fc_variant_item);
+    const variantList = document.querySelectorAll(foxy_variant_item);
+
+    if (!variantList.length) return;
 
     variantList.forEach(variantItem => {
       const variant = Object.values(variantItem.attributes).reduce((acc, currAttr) => {
         const { name, value } = currAttr;
 
-        if (name.includes("fc-variant") && value) {
-          const key = sanitize(name.split("fc-variant-")[1]);
+        if (name.includes("foxy-variant") && value) {
+          const key = sanitize(name.split("foxy-variant-")[1]);
           if (!acc[key]) acc[key === "sku" ? "code" : key] = sanitize(value);
           return acc;
         }
@@ -79,7 +79,7 @@ const pricingSettings = {
       // Add image to variant data
       variant.image = variantItem.querySelector("img")?.src;
 
-      variantItems.serialized[variant.code] = filterEmpty(variant);
+      variantItems.serialized[variant?.code ?? variant.name] = filterEmpty(variant);
       variantItems.array.push(filterEmpty(variant));
     });
     console.log("variantItems", variantItems);
@@ -88,10 +88,10 @@ const pricingSettings = {
   function buildVariantGroupList() {
     // Get variant group names, any custom sort orders if they exist, and their element design, either radio or select
     variantGroupElements.forEach(variantGroupElement => {
-      const name = sanitize(variantGroupElement.getAttribute("fc-variant-group"));
+      const name = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
       const customSortOrder =
         variantGroupElement
-          .getAttribute("fc-variant-group-order")
+          .getAttribute(foxy_variant_group_order)
           ?.trim()
           .split(/\s*,\s*/) ?? null;
 
@@ -146,7 +146,7 @@ const pricingSettings = {
   }
 
   function sortOptions(variantGroupOptions) {
-    const { sortBy, sortOrder } = variantGroupSettings;
+    const { sortBy, sortOrder } = config;
 
     const compareFn = (a, b) => {
       if (sortBy === "Price") {
@@ -213,15 +213,13 @@ const pricingSettings = {
     };
     const addSelectOptions = variantGroup => {
       const { element, name, options, customSortOrder, variantOptionDesign } = variantGroup;
-      if (!variantGroupSettings.selectOptionDefaultLabel) {
-        variantGroupSettings.selectOptionDefaultLabel = "Select an option";
-      }
+
       const variantOptions = customSortOrder ? customSortOrder : options;
       let variantSelect = variantOptionDesign.cloneNode(true);
-
+      const optionText = variantSelect.querySelector("option");
       variantSelect.required = true;
       variantSelect.name = capitalizeFirstLetter(name);
-      variantSelect.add(new Option(variantGroupSettings.selectOptionDefaultLabel, ""));
+      variantSelect.add(new Option(optionText.textContent, ""));
 
       variantOptions.forEach(option => {
         const selectOption = capitalizeFirstLetter(option);
@@ -257,6 +255,17 @@ const pricingSettings = {
         .sort((a, b) => a - b);
 
       if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
+        if (config.priceElementDisplay === "low") {
+          priceElement.textContent = money.format(sortedPrices[0]);
+          priceElement?.classList.remove("w-dyn-bind-empty");
+          return;
+        }
+        if (config.priceElementDisplay === "high") {
+          priceElement.textContent = money.format(sortedPrices[sortedPrices.length - 1]);
+          priceElement?.classList.remove("w-dyn-bind-empty");
+          return;
+        }
+
         const priceText = `${money.format(sortedPrices[0])} - ${money.format(
           sortedPrices[sortedPrices.length - 1]
         )}`;
@@ -272,17 +281,15 @@ const pricingSettings = {
   }
 
   function setInventory(isVariantsSelectionDone) {
-    if (isVariantsSelectionDone) {
-      const { inventory } =
-        variantItems.array.length === 1
-          ? variantItems.array[0]?.inventory ?? 0
-          : variantSelectionCompleteProduct;
+    if (isVariantsSelectionDone && inventoryElement) {
       const quantity = quantityElement.value;
       const submitButton = foxyForm.querySelector("input[type=submit]");
-      inventoryElement.textContent = "Please choose options.";
-
-      if (Number(inventory) === 0 || Number(quantity) > Number(inventory)) {
-        inventoryElement.textContent = "Out of stock.";
+      const inventory =
+        variantItems.array.length === 1
+          ? variantItems.array[0]?.inventory
+          : variantSelectionCompleteProduct?.inventory;
+      if (inventory === undefined) {
+        inventoryElement.textContent = "0";
         submitButton.disabled = true;
         submitButton.classList.add(disableClass);
         return;
@@ -304,17 +311,22 @@ const pricingSettings = {
     }
 
     if (variantItems.array.length > 1) {
-      inventoryElement.textContent = "Please choose options.";
-      inventoryElement.classList.remove("w-dyn-bind-empty");
+      if (inventoryElement) {
+        inventoryElement.textContent = "Please choose options.";
+        inventoryElement.classList.remove("w-dyn-bind-empty");
+      }
       return;
     }
   }
 
   function handleVariantSelection(e) {
-    const { name, nodeName, value } = e.target;
+    const targetElement = e.target;
+    const { name, nodeName, value } = targetElement;
     // Selecting the default select option returns early.
-    // The default select option is not a valid variant option.
     if (!value) return;
+
+    // Selecting or making a change to a input or select outside a variant group won't work
+    if (!targetElement.closest(`div${foxy_variant_group}`)) return;
 
     const variantSelectionGroup = sanitize(name);
     const currentVariantSelection = sanitize(value);
@@ -324,9 +336,11 @@ const pricingSettings = {
 
     // Remove disabled class from current selection
     if (nodeName === "INPUT") {
-      e.target.parentElement.classList.remove(disableClass);
+      targetElement.parentElement.classList.remove(disableClass);
     } else if (nodeName === "SELECT") {
-      e.target.querySelector(`option.${disableOptionClass}`)?.classList.remove(disableOptionClass);
+      targetElement
+        .querySelector(`option.${disableOptionClass}`)
+        ?.classList.remove(disableOptionClass);
     }
 
     const selectedProductVariants = getSelectedVariantOptions();
@@ -509,14 +523,17 @@ const pricingSettings = {
             // Update max quantity
             foxyForm.querySelector(`input[name="quantity_max"]`).value =
               variantSelectionCompleteProduct[key];
+            // Update max quantity element
+            quantityElement.setAttribute("max", variantSelectionCompleteProduct[key]);
             // Update inventory element
             setInventory(isVariantsSelectionDone);
             break;
           case "price":
-            console.log("price", variantSelectionCompleteProduct[key]);
             priceElement.textContent = money.format(variantSelectionCompleteProduct[key]);
             break;
           case "image":
+            // Remove srcset from primary image element
+            imageElement?.setAttribute("srcset", "");
             imageElement?.setAttribute("src", variantSelectionCompleteProduct[key]);
             break;
         }
