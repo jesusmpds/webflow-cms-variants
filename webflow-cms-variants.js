@@ -18,6 +18,7 @@ const config = {
   const foxy_variant_group = "foxy-variant-group";
   const foxy_variant_group_order = "foxy-variant-group-order";
   const foxy_variant_item = "[foxy-variant-item]";
+  const foxy_variant_group_name = "foxy-variant-group-name";
   let variantSelectionCompleteProduct;
   const variantItems = { serialized: {}, array: [] };
   const variantGroups = [];
@@ -88,7 +89,8 @@ const config = {
   function buildVariantGroupList() {
     // Get variant group names, any custom sort orders if they exist, and their element design, either radio or select
     variantGroupElements.forEach(variantGroupElement => {
-      const name = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
+      const cmsVariantGroupName = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
+
       const customSortOrder =
         variantGroupElement
           .getAttribute(foxy_variant_group_order)
@@ -97,15 +99,19 @@ const config = {
 
       const variantGroupType = variantGroupElementsType(variantGroupElement);
       const variantOptionDesign = variantGroupType === "select" ? "select" : ".w-radio";
-      const variantGroupOptions = getVariantGroupOptions(name);
+      const editorElementGroupName = sanitize(
+        variantGroupElement.querySelector(variantOptionDesign).getAttribute("data-name")
+      );
+      const variantGroupOptions = getVariantGroupOptions(cmsVariantGroupName);
       if (variantGroupOptions.length === 0) {
         variantGroupElement.remove();
       } else {
         variantGroups.push({
+          editorElementGroupName,
           customSortOrder,
           element: variantGroupElement,
           options: variantGroupOptions,
-          name,
+          name: cmsVariantGroupName,
           variantGroupType,
           variantOptionDesign: variantGroupElement.querySelector(variantOptionDesign),
         });
@@ -191,7 +197,14 @@ const config = {
 
   function renderVariantGroups() {
     const addRadioOptions = variantGroup => {
-      const { element, name, options, customSortOrder, variantOptionDesign } = variantGroup;
+      const {
+        editorElementGroupName,
+        element,
+        name,
+        options,
+        customSortOrder,
+        variantOptionDesign,
+      } = variantGroup;
       const variantOptions = customSortOrder ? customSortOrder : options;
 
       variantOptions.forEach((option, index) => {
@@ -203,8 +216,9 @@ const config = {
         label.setAttribute("for", `${option}-${index}`);
 
         radioInput.id = `${option}-${index}`;
-        radioInput.name = capitalizeFirstLetter(name);
+        radioInput.name = capitalizeFirstLetter(editorElementGroupName);
         radioInput.value = capitalizeFirstLetter(option);
+        radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
 
         // Add radio to variant group container
@@ -212,12 +226,20 @@ const config = {
       });
     };
     const addSelectOptions = variantGroup => {
-      const { element, name, options, customSortOrder, variantOptionDesign } = variantGroup;
+      const {
+        editorElementGroupName,
+        element,
+        name,
+        options,
+        customSortOrder,
+        variantOptionDesign,
+      } = variantGroup;
 
       const variantOptions = customSortOrder ? customSortOrder : options;
       let variantSelect = variantOptionDesign.cloneNode(true);
       variantSelect.required = true;
-      variantSelect.name = capitalizeFirstLetter(name);
+      variantSelect.name = capitalizeFirstLetter(editorElementGroupName);
+      variantSelect.setAttribute(foxy_variant_group_name, name);
 
       variantOptions.forEach(option => {
         const selectOption = capitalizeFirstLetter(option);
@@ -319,20 +341,17 @@ const config = {
 
   function handleVariantSelection(e) {
     const targetElement = e.target;
-    const { name, nodeName, value } = targetElement;
+    const { nodeName, value } = targetElement;
     // Selecting the default select option returns early.
     if (!value) return;
 
     // Selecting or making a change to a input or select outside a variant group won't work
     if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
 
-    const variantSelectionGroup = sanitize(name);
+    const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
     const currentVariantSelection = sanitize(value);
-    const isVariantsSelectionDone = isVariantsSelectionComplete();
-    if (variantSelectionGroup === "quantity" && isVariantsSelectionDone)
-      return setInventory(isVariantsSelectionDone);
 
-    // Remove disabled class from current selection
+    // Remove disabled class from current selections
     if (nodeName === "INPUT") {
       targetElement.parentElement.classList.remove(disableClass);
     } else if (nodeName === "SELECT") {
@@ -369,10 +388,14 @@ const config = {
         // If option selected is default option.value === "", return early
         if (!variant.value) return;
         if (variant.nodeName === "OPTION") {
-          selectedProductVariants[sanitize(variant.parentElement.name)] = sanitize(variant.value);
+          selectedProductVariants[
+            sanitize(variant.parentElement.getAttribute(foxy_variant_group_name))
+          ] = sanitize(variant.value);
           return;
         }
-        selectedProductVariants[sanitize(variant.name)] = sanitize(variant.value);
+        selectedProductVariants[sanitize(variant.getAttribute(foxy_variant_group_name))] = sanitize(
+          variant.value
+        );
       });
     return selectedProductVariants;
   }
@@ -420,9 +443,10 @@ const config = {
     let variantGroupsStateChange = false;
 
     otherVariantGroups.forEach(otherVariantGroup => {
-      const { element, variantGroupType, name, options } = otherVariantGroup;
+      const { editorElementGroupName, element, variantGroupType, name, options } =
+        otherVariantGroup;
       console.log("otherVariantGroup", otherVariantGroup);
-      const variantGroupName = capitalizeFirstLetter(name);
+      const variantGroupName = capitalizeFirstLetter(editorElementGroupName);
       // Check if other groups have selections
       const hasSelection = hasVariantSelection(element, variantGroupType);
 
