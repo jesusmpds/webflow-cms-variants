@@ -5,7 +5,7 @@ const config = {
   sortOrder: "ascending", //ascending or descending (or leave blank for default sorting)
   locale: "en-US", // The language used by and regional preference of the user
   currency: "USD", // The currency for the price elements on the page
-  priceElementDisplay: "", //Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
+  priceElementDisplay: "high", //Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
   inventoryDefaultLabel: "Please choose options", // If using an inventory element, add the text that you want to show when the product has variants, before variant selection is completed. Or leave blank for default.
 };
 
