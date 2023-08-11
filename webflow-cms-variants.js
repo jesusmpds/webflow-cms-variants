@@ -101,7 +101,7 @@ const config = {
           .getAttribute("data-name");
       }
       editorElementGroupName = variantGroupElement
-        .querySelector(`${variantOptionDesignElement} input[type=radio]`)
+        .querySelector(`${variantOptionDesignElement} input[type='radio']`)
         .getAttribute("data-name");
 
       const customSortOrder =
