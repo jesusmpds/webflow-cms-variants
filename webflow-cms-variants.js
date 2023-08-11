@@ -71,7 +71,9 @@ const config = {
 
         if (name.includes("foxy-variant") && value) {
           const key = sanitize(name.split("foxy-variant-")[1]);
-          if (!acc[key]) acc[key === "sku" ? "code" : key] = sanitize(value);
+          if (!acc[key]) {
+            acc[key === "sku" ? "code" : key] = key === "name" ? value : sanitize(value);
+          }
           return acc;
         }
         return acc;
@@ -638,6 +640,5 @@ const config = {
   }
 
   // Initialization
-
   init();
 })();
