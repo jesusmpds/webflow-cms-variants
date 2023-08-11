@@ -216,7 +216,9 @@ const config = {
         label.setAttribute("for", `${option}-${index}`);
 
         radioInput.id = `${option}-${index}`;
-        radioInput.name = capitalizeFirstLetter(editorElementGroupName);
+        radioInput.name = capitalizeFirstLetter(
+          editorElementGroupName ? editorElementGroupName : name
+        );
         radioInput.value = capitalizeFirstLetter(option);
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
@@ -238,7 +240,9 @@ const config = {
       const variantOptions = customSortOrder ? customSortOrder : options;
       let variantSelect = variantOptionDesign.cloneNode(true);
       variantSelect.required = true;
-      variantSelect.name = capitalizeFirstLetter(editorElementGroupName);
+      variantSelect.name = capitalizeFirstLetter(
+        editorElementGroupName ? editorElementGroupName : name
+      );
       variantSelect.setAttribute(foxy_variant_group_name, name);
 
       variantOptions.forEach(option => {
@@ -446,7 +450,9 @@ const config = {
       const { editorElementGroupName, element, variantGroupType, name, options } =
         otherVariantGroup;
       console.log("otherVariantGroup", otherVariantGroup);
-      const variantGroupName = capitalizeFirstLetter(editorElementGroupName);
+      const variantGroupName = capitalizeFirstLetter(
+        editorElementGroupName ? editorElementGroupName : name
+      );
       // Check if other groups have selections
       const hasSelection = hasVariantSelection(element, variantGroupType);
 
@@ -605,6 +611,7 @@ const config = {
   }
 
   function sanitize(string) {
+    if (typeof string !== "string") return string;
     return string.trim().toLowerCase();
   }
 
