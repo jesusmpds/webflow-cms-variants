@@ -89,7 +89,20 @@ const config = {
   function buildVariantGroupList() {
     // Get variant group names, any custom sort orders if they exist, and their element design, either radio or select
     variantGroupElements.forEach(variantGroupElement => {
+      let editorElementGroupName;
       const cmsVariantGroupName = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
+      const variantGroupOptions = getVariantGroupOptions(cmsVariantGroupName);
+
+      const variantGroupType = variantGroupElementsType(variantGroupElement);
+      const variantOptionDesignElement = variantGroupType === "select" ? "select" : ".w-radio";
+      if (variantOptionDesignElement === "select") {
+        editorElementGroupName = variantGroupElement
+          .querySelector(variantOptionDesignElement)
+          .getAttribute("data-name");
+      }
+      editorElementGroupName = variantGroupElement
+        .querySelector(`${variantOptionDesignElement} input[type=radio]`)
+        .getAttribute("data-name");
 
       const customSortOrder =
         variantGroupElement
@@ -97,12 +110,6 @@ const config = {
           ?.trim()
           .split(/\s*,\s*/) ?? null;
 
-      const variantGroupType = variantGroupElementsType(variantGroupElement);
-      const variantOptionDesign = variantGroupType === "select" ? "select" : ".w-radio";
-      const editorElementGroupName = sanitize(
-        variantGroupElement.querySelector(variantOptionDesign).getAttribute("data-name")
-      );
-      const variantGroupOptions = getVariantGroupOptions(cmsVariantGroupName);
       if (variantGroupOptions.length === 0) {
         variantGroupElement.remove();
       } else {
@@ -113,9 +120,9 @@ const config = {
           options: variantGroupOptions,
           name: cmsVariantGroupName,
           variantGroupType,
-          variantOptionDesign: variantGroupElement.querySelector(variantOptionDesign),
+          variantOptionDesign: variantGroupElement.querySelector(variantOptionDesignElement),
         });
-        variantGroupElement.querySelector(variantOptionDesign).remove();
+        variantGroupElement.querySelector(variantOptionDesignElement).remove();
       }
     });
     console.log("variantGroups", variantGroups);
