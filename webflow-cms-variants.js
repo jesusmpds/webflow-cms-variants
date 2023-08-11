@@ -313,25 +313,35 @@ const config = {
   }
 
   function setInventory(isVariantsSelectionDone) {
-    if (isVariantsSelectionDone && inventoryElement) {
+    // Variant selection complete
+    if (isVariantsSelectionDone) {
       const quantity = quantityElement.value;
       const submitButton = foxyForm.querySelector("input[type=submit]");
       const inventory =
         variantItems.array.length === 1
           ? variantItems.array[0]?.inventory
           : variantSelectionCompleteProduct?.inventory;
-      if (inventory === undefined) {
-        inventoryElement.textContent = "0";
-        submitButton.disabled = true;
-        submitButton.classList.add(disableClass);
-        return;
+
+      if (inventory == undefined) return;
+
+      if (Number(quantity) > Number(inventory)) {
+        quantityElement.value = 1;
       }
 
-      if (Number(quantity) <= Number(inventory)) {
-        inventoryElement.textContent = inventory;
-        submitButton.disabled = false;
-        submitButton.classList.remove(disableClass);
-        return;
+      if (inventoryElement) {
+        if (inventory === undefined) {
+          inventoryElement.textContent = "0";
+          submitButton.disabled = true;
+          submitButton.classList.add(disableClass);
+          return;
+        }
+
+        if (Number(quantity) <= Number(inventory)) {
+          inventoryElement.textContent = inventory;
+          submitButton.disabled = false;
+          submitButton.classList.remove(disableClass);
+          return;
+        }
       }
       return;
     }
