@@ -405,7 +405,9 @@ const config = {
     // Save the selected product variants
     const selectedProductVariants = {};
     foxyForm
-      .querySelectorAll("input:checked, select[required]:valid option:checked, option:checked")
+      .querySelectorAll(
+        `div[${foxy_variant_group}] input:checked, div[${foxy_variant_group}] select[required]:valid option:checked,div[${foxy_variant_group}] option:checked`
+      )
       .forEach(variant => {
         // If option selected is default option.value === "", return early
         if (!variant.value) return;
