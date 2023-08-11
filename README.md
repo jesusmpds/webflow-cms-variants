@@ -58,13 +58,8 @@ For stock change functionality the stock element needs to have the custom elemen
 
 ## Script Configurations
 
-The script contains `Variant Group Settings` and `Pricing Settings`
+### Sorting Settings
 
-Each with it's own variable with different properties.
-
-### Variant Group Settings
-
-- selectOptionDefaultLabel: This is the text label for the default option or placeholder text for any Select fields (or leave blank for default label)
 - sortBy: Label or Price values (or leave blank for default sorting)
 - sortOrder: Ascending or Descending (or leave blank for default sorting)
 
@@ -72,3 +67,8 @@ Each with it's own variable with different properties.
 
 - locale: The language used by and regional preference of the user, e.g: "en-US"
 - currency: The currency for the price elements on the page, e.g: "USD"
+- priceElementDisplay: Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
+
+### Inventory Settings
+
+- inventoryDefaultLabel: If using an inventory element, add the text that you want to show when the product has variants, before variant selection is completed. Or leave blank for default.

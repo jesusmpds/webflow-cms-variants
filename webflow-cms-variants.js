@@ -1,5 +1,4 @@
 // Script configuration
-// config
 const config = {
   sortBy: "price", // label, price (or leave blank for default sorting)
   sortOrder: "ascending", //ascending or descending (or leave blank for default sorting)
@@ -11,7 +10,7 @@ const config = {
 
 // End Script Configuration
 
-(() => {
+(function () {
   // Constants and variables
   const disableClass = "foxy-disable";
   const disableOptionClass = "foxy-disable-option";
