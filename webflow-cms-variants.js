@@ -284,7 +284,7 @@ const config = {
         .sort((a, b) => a - b);
 
       if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
-        if (config.priceElementDisplay === "low") {
+        if (config.priceDisplay === "low") {
           priceElement.textContent = money.format(sortedPrices[0]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
