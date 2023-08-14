@@ -1,14 +1,12 @@
-// Script configuration
+// Foxy Variant Script v1.0.0
 const config = {
-  sortBy: "price", // label, price (or leave blank for default sorting)
-  sortOrder: "ascending", //ascending or descending (or leave blank for default sorting)
-  locale: "en-US", // The language used by and regional preference of the user
-  currency: "USD", // The currency for the price elements on the page
-  priceElementDisplay: "high", //Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
-  inventoryDefaultLabel: "Please choose options", // If using an inventory element, add the text that you want to show when the product has variants, before variant selection is completed. Or leave blank for default.
+  sortBy: "price",
+  sortOrder: "ascending",
+  locale: "en-US",
+  currency: "USD",
+  priceDisplay: "high",
+  inventoryDefaultLabel: "Please choose options",
 };
-
-// End Script Configuration
 
 (function () {
   // Constants and variables
@@ -21,11 +19,11 @@ const config = {
   let variantSelectionCompleteProduct;
   const variantItems = { serialized: {}, array: [] };
   const variantGroups = [];
-  const foxyForm = document.querySelector("[foxy-form]");
-  const imageElement = document.querySelector("[foxy-image]");
+  const foxyForm = document.querySelector("[foxy-id='form']");
+  const imageElement = document.querySelector("[foxy-id='image']");
   const quantityElement = foxyForm.querySelector("input[name='quantity']");
-  const priceElement = document.querySelector("[foxy-price]");
-  const inventoryElement = document.querySelector("[foxy-inventory]");
+  const priceElement = document.querySelector("[foxy-id='price']");
+  const inventoryElement = document.querySelector("[foxy-id='inventory']");
   const priceAddToCart = foxyForm.querySelector("input[name='price']");
   const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
   const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);

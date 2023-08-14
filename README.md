@@ -4,7 +4,7 @@
 
 User will add a custom attribute to the form on the Product CMS page with the value:
 
-`foxy-form=""`
+`foxy-id="form"`
 
 ### Variant Options
 
@@ -42,19 +42,19 @@ Sizes being a field on the Product CMS that has a comma separated list of values
 
 For image change functionality the main product image needs to have the custom attribute:
 
-`foxy-image=""`
+`foxy-id="image"`
 
 ## Price
 
 For real time price change on variant selection the price element must have the custom attribute:
 
-`foxy-price=""`
+`foxy-id="price"`
 
 ## Stock
 
 For stock change functionality the stock element needs to have the custom element:
 
-`foxy-stock=""`
+`foxy-id="inventory"`
 
 ## Script Configurations
 
@@ -67,7 +67,7 @@ For stock change functionality the stock element needs to have the custom elemen
 
 - locale: The language used by and regional preference of the user, e.g: "en-US"
 - currency: The currency for the price elements on the page, e.g: "USD"
-- priceElementDisplay: Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
+- priceDisplay: Add "low" or "high". or leave blank for default. The way the price element shows when there are variants that affect price. Default is a range low-high. Here you can set it for only showing the highest or lowest number only on page load.
 
 ### Inventory Settings
 
