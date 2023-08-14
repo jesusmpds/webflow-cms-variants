@@ -14,7 +14,7 @@ const config = {
   const disableOptionClass = "foxy-disable-option";
   const foxy_variant_group = "foxy-variant-group";
   const foxy_variant_group_order = "foxy-variant-group-order";
-  const foxy_variant_item = "[foxy-variant-item]";
+  const foxy_variant_item = "[foxy-id='variant-item']";
   const foxy_variant_group_name = "foxy-variant-group-name";
   let variantSelectionCompleteProduct;
   const variantItems = { serialized: {}, array: [] };
