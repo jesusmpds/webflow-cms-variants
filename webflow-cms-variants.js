@@ -35,7 +35,7 @@ const config = {
       "beforeend",
       `<style>
     .${disableClass} {opacity: 0.5 !important; }  
-    .${disableOptionClass} {color: #808080 !important; } 
+    .${disableOptionClass} {color: #808080 !important;-webkit-appearance: none; -webkit-color: #808080 !important;} 
     </style>`
     );
     // Set quantity input defaults
