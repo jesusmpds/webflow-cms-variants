@@ -289,7 +289,7 @@ const config = {
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
-        if (config.priceElementDisplay === "high") {
+        if (config.priceDisplay === "high") {
           priceElement.textContent = money.format(sortedPrices[sortedPrices.length - 1]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
