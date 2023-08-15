@@ -6,6 +6,7 @@ const config = {
   currency: "USD",
   priceDisplay: "high",
   inventoryDefaultLabel: "Please choose options",
+  selectUnavailableLabel: "Unavailable",
 };
 
 (function () {
@@ -35,7 +36,7 @@ const config = {
       "beforeend",
       `<style>
     .${disableClass} {opacity: 0.5 !important; }  
-    .${disableOptionClass} {color: #808080 !important;-webkit-appearance: none; -webkit-color: #808080 !important;} 
+    .${disableOptionClass} {color: #808080 !important;} 
     </style>`
     );
     // Set quantity input defaults
@@ -69,7 +70,7 @@ const config = {
         if (name.includes("foxy-variant") && value) {
           const key = sanitize(name.split("foxy-variant-")[1]);
           if (!acc[key]) {
-            acc[key === "sku" ? "code" : key] = key === "name" ? value : sanitize(value);
+            acc[key === "sku" ? "code" : key] = value;
           }
           return acc;
         }
@@ -368,7 +369,7 @@ const config = {
     if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
 
     const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
-    const currentVariantSelection = sanitize(value);
+    const currentVariantSelection = value;
 
     // Remove disabled class from current selections
     if (nodeName === "INPUT") {
@@ -411,12 +412,11 @@ const config = {
         if (variant.nodeName === "OPTION") {
           selectedProductVariants[
             sanitize(variant.parentElement.getAttribute(foxy_variant_group_name))
-          ] = sanitize(variant.value);
+          ] = variant.value;
           return;
         }
-        selectedProductVariants[sanitize(variant.getAttribute(foxy_variant_group_name))] = sanitize(
-          variant.value
-        );
+        selectedProductVariants[sanitize(variant.getAttribute(foxy_variant_group_name))] =
+          variant.value;
       });
     return selectedProductVariants;
   }
