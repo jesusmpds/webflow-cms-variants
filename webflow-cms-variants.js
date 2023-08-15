@@ -118,6 +118,8 @@ const config = {
           name: cmsVariantGroupName,
           variantGroupType,
           variantOptionDesign: variantGroupElement.querySelector(variantOptionDesignElement),
+          variantOptionDesignParent: variantGroupElement.querySelector(variantOptionDesignElement)
+            .parentElement,
         });
         variantGroupElement.querySelector(variantOptionDesignElement).remove();
       }
@@ -208,6 +210,7 @@ const config = {
         options,
         customSortOrder,
         variantOptionDesign,
+        variantOptionDesignParent,
       } = variantGroup;
       const variantOptions = customSortOrder ? customSortOrder : options;
 
@@ -227,10 +230,10 @@ const config = {
         radioInput.required = true;
 
         // Add radio to variant group container containing parent
-        if (variantOptionDesign.parentElement.getAttribute(foxy_variant_group)) {
+        if (variantOptionDesignParent?.getAttribute(foxy_variant_group)) {
           element.append(variantOptionClone);
         } else {
-          variantOptionDesign.parentElement.append(variantOptionClone);
+          variantOptionDesignParent.append(variantOptionClone);
         }
       });
     };
@@ -242,6 +245,7 @@ const config = {
         options,
         customSortOrder,
         variantOptionDesign,
+        variantOptionDesignParent,
       } = variantGroup;
 
       const variantOptions = customSortOrder ? customSortOrder : options;
@@ -257,10 +261,10 @@ const config = {
       });
 
       // Add select to variant group container
-      if (variantOptionDesign.parentElement.getAttribute(foxy_variant_group)) {
+      if (variantOptionDesignParent.getAttribute(foxy_variant_group)) {
         element.append(variantSelect);
       } else {
-        variantOptionDesign.parentElement.append(variantSelect);
+        variantOptionDesignParent.append(variantSelect);
       }
     };
 
