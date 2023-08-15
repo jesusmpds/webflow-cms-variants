@@ -285,24 +285,30 @@ const config = {
 
       if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
         if (config.priceDisplay === "low") {
-          priceElement.textContent = moneyFormat(sortedPrices[0]);
+          priceElement.textContent = moneyFormat(config.locale, config.currency, sortedPrices[0]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
         if (config.priceDisplay === "high") {
-          priceElement.textContent = moneyFormat(sortedPrices[sortedPrices.length - 1]);
+          priceElement.textContent = moneyFormat(
+            config.locale,
+            config.currency,
+            sortedPrices[sortedPrices.length - 1]
+          );
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
 
-        const priceText = `${moneyFormat(sortedPrices[0])} - ${moneyFormat(
-          sortedPrices[sortedPrices.length - 1]
-        )}`;
+        const priceText = `${moneyFormat(
+          config.locale,
+          config.currency,
+          sortedPrices[0]
+        )} - ${moneyFormat(config.locale, config.currency, sortedPrices[sortedPrices.length - 1])}`;
         priceElement.textContent = priceText;
         priceElement?.classList.remove("w-dyn-bind-empty");
       } else {
         // Variants that don't affect price
-        const price = moneyFormat(sortedPrices[0]);
+        const price = moneyFormat(config.locale, config.currency, sortedPrices[0]);
         priceElement.textContent = price;
         priceAddToCart.value = price;
       }
@@ -573,7 +579,11 @@ const config = {
             setInventory(isVariantsSelectionDone);
             break;
           case "price":
-            priceElement.textContent = moneyFormat(variantSelectionCompleteProduct[key]);
+            priceElement.textContent = moneyFormat(
+              config.locale,
+              config.currency,
+              variantSelectionCompleteProduct[key]
+            );
             break;
           case "image":
             // Remove srcset from primary image element
