@@ -487,7 +487,7 @@ const config = {
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options
           unavailableOptions.forEach(option => {
-            const variantOption = capitalizeFirstLetter(option);
+            const variantOption = option;
             const radioInput = element.querySelector(`input[value="${variantOption}"]`);
             radioInput.parentElement.classList.add(disableClass);
 
@@ -516,7 +516,7 @@ const config = {
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options
           unavailableOptions.forEach(option => {
-            const variantOption = capitalizeFirstLetter(option);
+            const variantOption = option;
             const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
             const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
             selectOption.classList.add(disableOptionClass);
