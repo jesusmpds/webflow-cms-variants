@@ -28,7 +28,6 @@ const config = {
   const priceAddToCart = foxyForm.querySelector("input[name='price']");
   const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
   const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
-  const money = moneyFormat(config.locale, config.currency);
 
   function init() {
     //Insert disabled class styles
@@ -286,24 +285,24 @@ const config = {
 
       if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
         if (config.priceDisplay === "low") {
-          priceElement.textContent = money.format(sortedPrices[0]);
+          priceElement.textContent = moneyFormat(sortedPrices[0]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
         if (config.priceDisplay === "high") {
-          priceElement.textContent = money.format(sortedPrices[sortedPrices.length - 1]);
+          priceElement.textContent = moneyFormat(sortedPrices[sortedPrices.length - 1]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
 
-        const priceText = `${money.format(sortedPrices[0])} - ${money.format(
+        const priceText = `${moneyFormat(sortedPrices[0])} - ${moneyFormat(
           sortedPrices[sortedPrices.length - 1]
         )}`;
         priceElement.textContent = priceText;
         priceElement?.classList.remove("w-dyn-bind-empty");
       } else {
         // Variants that don't affect price
-        const price = money.format(sortedPrices[0]);
+        const price = moneyFormat(sortedPrices[0]);
         priceElement.textContent = price;
         priceAddToCart.value = price;
       }
@@ -574,7 +573,7 @@ const config = {
             setInventory(isVariantsSelectionDone);
             break;
           case "price":
-            priceElement.textContent = money.format(variantSelectionCompleteProduct[key]);
+            priceElement.textContent = moneyFormat(variantSelectionCompleteProduct[key]);
             break;
           case "image":
             // Remove srcset from primary image element
@@ -616,11 +615,18 @@ const config = {
     return false;
   }
 
-  function moneyFormat(locale, currency) {
+  function moneyFormat(locale, currency, number) {
+    const numericValue = parseFloat(number);
+    const decimalPlaces = numericValue.toString().includes(".")
+      ? numericValue.toString().split(".")[1].length
+      : 0;
+
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
-    });
+      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: decimalPlaces,
+    }).format(numericValue);
   }
 
   function capitalizeFirstLetter(string) {
