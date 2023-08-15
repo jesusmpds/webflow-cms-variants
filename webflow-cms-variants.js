@@ -227,7 +227,7 @@ const config = {
         radioInput.required = true;
 
         // Add radio to variant group container containing parent
-        if (variantOptionClone.parentElement.getAttribute(foxy_variant_group)) {
+        if (variantOptionDesign.parentElement.getAttribute(foxy_variant_group)) {
           element.append(variantOptionClone);
         } else {
           variantOptionDesign.parentElement.append(variantOptionClone);
@@ -257,7 +257,7 @@ const config = {
       });
 
       // Add select to variant group container
-      if (variantSelect.parentElement.getAttribute(foxy_variant_group)) {
+      if (variantOptionDesign.parentElement.getAttribute(foxy_variant_group)) {
         element.append(variantSelect);
       } else {
         variantOptionDesign.parentElement.append(variantSelect);
