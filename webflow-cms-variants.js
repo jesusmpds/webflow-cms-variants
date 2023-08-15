@@ -380,14 +380,14 @@ const config = {
     if (nodeName === "INPUT") {
       targetElement.parentElement.classList.remove(disableClass);
     } else if (nodeName === "SELECT") {
-      const unavailableText = ` (${config.selectUnavailableLabel})`;
-      const option = targetElement.querySelector(`option.${disableOptionClass}`);
+      targetElement.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
+        option.classList.remove(disableOptionClass);
 
-      option?.classList.remove(disableOptionClass);
-      // Get the option textContent split it by the unavailable text and remove it
-
-      const optionText = option.textContent.split(unavailableText)[0];
-      option.textContent = optionText;
+        // Get the option textContent split it by the unavailable text and remove it
+        const unavailableText = ` (${config.selectUnavailableLabel})`;
+        const optionText = option.textContent.split(unavailableText)[0];
+        option.textContent = optionText;
+      });
     }
 
     const selectedProductVariants = getSelectedVariantOptions();
