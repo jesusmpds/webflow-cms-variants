@@ -226,8 +226,12 @@ const config = {
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
 
-        // Add radio to variant group container
-        element.append(variantOptionClone);
+        // Add radio to variant group container containing parent
+        if (variantOptionClone.parentElement.getAttribute(foxy_variant_group)) {
+          element.append(variantOptionClone);
+        } else {
+          variantOptionDesign.parentElement.append(variantOptionClone);
+        }
       });
     };
     const addSelectOptions = variantGroup => {
@@ -253,7 +257,11 @@ const config = {
       });
 
       // Add select to variant group container
-      element.append(variantSelect);
+      if (variantSelect.parentElement.getAttribute(foxy_variant_group)) {
+        element.append(variantSelect);
+      } else {
+        variantOptionDesign.parentElement.append(variantSelect);
+      }
     };
 
     // No variant groups early return
