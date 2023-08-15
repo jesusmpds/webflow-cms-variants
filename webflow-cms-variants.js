@@ -69,7 +69,7 @@ const config = {
         if (name.includes("foxy-variant") && value) {
           const key = sanitize(name.split("foxy-variant-")[1]);
           if (!acc[key]) {
-            acc[key === "sku" ? "code" : key] = value;
+            acc[key === "sku" ? "code" : key] = value.trim();
           }
           return acc;
         }
