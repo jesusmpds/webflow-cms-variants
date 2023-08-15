@@ -220,13 +220,13 @@ const config = {
         const radioInput = variantOptionClone.querySelector("input[type=radio]");
         const label = variantOptionClone.querySelector("span[for]");
 
-        label.textContent = capitalizeFirstLetter(option);
+        label.textContent = option;
         label.setAttribute("for", `${option}-${index}`);
 
         radioInput.id = `${option}-${index}`;
         radioInput.name = editorElementGroupName ? editorElementGroupName : name;
 
-        radioInput.value = capitalizeFirstLetter(option);
+        radioInput.value = option;
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
 
@@ -252,7 +252,7 @@ const config = {
       variantSelect.setAttribute(foxy_variant_group_name, name);
 
       variantOptions.forEach(option => {
-        const selectOption = capitalizeFirstLetter(option);
+        const selectOption = option;
         variantSelect.add(new Option(selectOption, selectOption));
       });
 
