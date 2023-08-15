@@ -136,7 +136,7 @@ const config = {
   function getVariantGroupOptions(groupName) {
     const variantGroupOptions = [];
     variantItems.array.forEach(variantItem => {
-      const variantOption = variantItem[groupName];
+      const variantOption = variantItem[groupName].trim();
 
       // Only add variant option to array if it is not already in the array
       if (
