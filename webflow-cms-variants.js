@@ -380,9 +380,14 @@ const config = {
     if (nodeName === "INPUT") {
       targetElement.parentElement.classList.remove(disableClass);
     } else if (nodeName === "SELECT") {
-      targetElement
-        .querySelector(`option.${disableOptionClass}`)
-        ?.classList.remove(disableOptionClass);
+      const unavailableText = ` (${config.selectUnavailableLabel})`;
+      const option = targetElement.querySelector(`option.${disableOptionClass}`);
+
+      option?.classList.remove(disableOptionClass);
+      // Get the option textContent split it by the unavailable text and remove it
+
+      const optionText = option.textContent.split(unavailableText)[0];
+      option.textContent = optionText;
     }
 
     const selectedProductVariants = getSelectedVariantOptions();
@@ -472,7 +477,7 @@ const config = {
       const { editorElementGroupName, element, variantGroupType, name, options } =
         otherVariantGroup;
       console.log("otherVariantGroup", otherVariantGroup);
-      const variantGroupName = capitalizeFirstLetter(
+      const otherVariantGroupName = capitalizeFirstLetter(
         editorElementGroupName ? editorElementGroupName : name
       );
       // Check if other groups have selections
@@ -483,10 +488,10 @@ const config = {
       const unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
       console.log("unavailableOptions", unavailableOptions);
 
-      // Disable unavailable options for radio elements or select input elements. capitalize the values to match the DOM
+      // Disable unavailable options for radio elements or select input elements.
       if (variantGroupType === "radio") {
         //Remove disabled
-        element.querySelectorAll(`input[name=${variantGroupName}]`).forEach(input => {
+        element.querySelectorAll(`input[name=${otherVariantGroupName}]`).forEach(input => {
           input.parentElement.classList.remove(disableClass);
         });
         if (unavailableOptions.length !== 0) {
@@ -516,18 +521,26 @@ const config = {
       } else if (variantGroupType === "select") {
         element.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
           option.classList.remove(disableOptionClass);
+
+          // Get the option textContent split it by the unavailable text and remove it
+          const unavailableText = ` (${config.selectUnavailableLabel})`;
+          const optionText = option.textContent.split(unavailableText)[0];
+          option.textContent = optionText;
         });
 
         if (unavailableOptions.length !== 0) {
-          // Add disabled class to unavailable options
+          // Add disabled class to unavailable options and unavailable text from config
           unavailableOptions.forEach(option => {
-            const variantOption = option;
-            const selectOption = element.querySelector(`select option[value="${variantOption}"]`);
+            const selectOption = element.querySelector(`select option[value="${option}"]`);
             const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
             selectOption.classList.add(disableOptionClass);
+            if (config.selectUnavailableLabel) {
+              const unavailableText = `(${config.selectUnavailableLabel})`;
+              selectOption.textContent = `${selectOption.textContent} ${unavailableText}`;
+            }
 
             // if variant group already has a selection
-            if (hasSelection && selectedOptionValue === variantOption) {
+            if (hasSelection && selectedOptionValue === option) {
               element.querySelector(`select`).selectedIndex = 0;
               variantGroupsStateChange = true;
             }
