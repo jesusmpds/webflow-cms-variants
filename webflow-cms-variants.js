@@ -233,8 +233,6 @@ const config = {
         const variantOptionData = optionsData.find(
           optionData => optionData.variantOption === option
         );
-        console.log("option", option);
-        console.log("variantOptionData", variantOptionData);
 
         const variantOptionClone = variantOptionDesign.cloneNode(true);
         const radioInput = variantOptionClone.querySelector("input[type=radio]");
@@ -250,7 +248,7 @@ const config = {
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
 
-        const customInput = variantOptionDesign.querySelector(".w-radio-input");
+        const customInput = variantOptionClone.querySelector("div.w-radio-input");
         // Apply any css styles to the current variant option
         customInput ? style(customInput, variantOptionData.styles) : null;
 
