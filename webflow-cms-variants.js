@@ -147,7 +147,7 @@ const config = {
           .filter(([key, value]) => {
             if (key.includes(`${groupName}-`) && value) return true;
           })
-          .map(([key, value]) => [key.replace(`${groupName}-`), value])
+          .map(([key, value]) => [key.replace(`${groupName}-`, ""), value])
       );
 
       // Only add variant option to array if it is not already in the array
