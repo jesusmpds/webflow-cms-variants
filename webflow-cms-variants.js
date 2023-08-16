@@ -233,6 +233,9 @@ const config = {
         const variantOptionData = optionsData.find(
           optionData => optionData.variantOption === option
         );
+        console.log("option", option);
+        console.log("variantOptionData", variantOptionData);
+
         const variantOptionClone = variantOptionDesign.cloneNode(true);
         const radioInput = variantOptionClone.querySelector("input[type=radio]");
         const label = variantOptionClone.querySelector("span[for]");
