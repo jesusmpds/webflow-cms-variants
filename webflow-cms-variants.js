@@ -143,11 +143,11 @@ const config = {
       const variantOption = variantItem[groupName]?.trim();
       // Filter the variantItem for keys with the groupName plus a "-", slice it off and use the rest as they key for the variantGroupOPtions object
       const variantItemStyles = Object.fromEntries(
-        Object.entries(variantItem).filter(([key, value]) => {
-          if (key.includes(`${groupName}-`)) {
-            return [key.replace(`${groupName}-`), value];
-          }
-        })
+        Object.entries(variantItem)
+          .filter(([key, value]) => {
+            if (key.includes(`${groupName}-`)) return true;
+          })
+          .map(([key, value]) => [key.replace(`${groupName}-`), value])
       );
 
       // Only add variant option to array if it is not already in the array
