@@ -145,7 +145,7 @@ const config = {
       const variantItemStyles = Object.fromEntries(
         Object.entries(variantItem)
           .filter(([key, value]) => {
-            if (key.includes(`${groupName}-`)) return true;
+            if (key.includes(`${groupName}-`) && value) return true;
           })
           .map(([key, value]) => [key.replace(`${groupName}-`), value])
       );
