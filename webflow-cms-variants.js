@@ -87,7 +87,8 @@ const config = {
     variantGroupElements.forEach(variantGroupElement => {
       let editorElementGroupName;
       const cmsVariantGroupName = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
-      const variantGroupOptions = getVariantGroupOptions(cmsVariantGroupName);
+      const variantOptionsData = getVariantGroupOptions(cmsVariantGroupName);
+      const variantGroupOptions = variantOptionsData.map(option => option.variantOption);
 
       const variantGroupType = variantGroupElementsType(variantGroupElement);
       const variantOptionDesignElement = variantGroupType === "select" ? "select" : ".w-radio";
@@ -115,6 +116,7 @@ const config = {
           customSortOrder,
           element: variantGroupElement,
           options: variantGroupOptions,
+          optionsData: variantOptionsData,
           name: cmsVariantGroupName,
           variantGroupType,
           variantOptionDesign: variantGroupElement.querySelector(variantOptionDesignElement),
@@ -139,6 +141,14 @@ const config = {
     const variantGroupOptions = [];
     variantItems.array.forEach(variantItem => {
       const variantOption = variantItem[groupName]?.trim();
+      // Filter the variantItem for keys with the groupName plus a "-", slice it off and use the rest as they key for the variantGroupOPtions object
+      const variantItemStyles = Object.fromEntries(
+        Object.entries(variantItem).filter(([key, value]) => {
+          if (key.includes(`${groupName}-`)) {
+            return [key.slice(`${groupName}-`), value];
+          }
+        })
+      );
 
       // Only add variant option to array if it is not already in the array
       if (
@@ -149,12 +159,13 @@ const config = {
           label: variantItem.label,
           price: variantItem.price,
           variantOption,
+          styles: variantItemStyles,
         });
       }
     });
 
     sortOptions(variantGroupOptions);
-    return variantGroupOptions.map(option => option.variantOption);
+    return variantGroupOptions;
   }
 
   function sortOptions(variantGroupOptions) {
@@ -202,12 +213,16 @@ const config = {
   }
 
   function renderVariantGroups() {
+    const style = (node, styles) =>
+      Object.keys(styles).forEach(key => (node.style[key] = styles[key]));
+
     const addRadioOptions = variantGroup => {
       const {
         editorElementGroupName,
         element,
         name,
         options,
+        optionsData,
         customSortOrder,
         variantOptionDesign,
         variantOptionDesignParent,
@@ -215,6 +230,9 @@ const config = {
       const variantOptions = customSortOrder ? customSortOrder : options;
 
       variantOptions.forEach((option, index) => {
+        const variantOptionData = optionsData.find(
+          optionData => optionData.variantOption === option
+        );
         const variantOptionClone = variantOptionDesign.cloneNode(true);
         const radioInput = variantOptionClone.querySelector("input[type=radio]");
         const label = variantOptionClone.querySelector("span[for]");
@@ -228,6 +246,10 @@ const config = {
         radioInput.value = option;
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
+
+        const customInput = variantOptionDesign.querySelector(".w-radio-input");
+        // Apply any css styles to the current variant option
+        customInput ? style(customInput, variantOptionData.styles) : null;
 
         // Add radio to variant group container containing parent
         if (variantOptionDesignParent?.getAttribute(foxy_variant_group)) {
