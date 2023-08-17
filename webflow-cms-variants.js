@@ -39,8 +39,8 @@ const config = {
     </style>`
     );
     // Set quantity input defaults
-    quantityElement.value = 1;
-    quantityElement.setAttribute("min", "1");
+    quantityElement?.setAttribute("value", "1");
+    quantityElement?.setAttribute("min", "1");
 
     // Build variant list info into variable
     buildVariantList();
@@ -350,7 +350,7 @@ const config = {
   function setInventory(isVariantsSelectionDone) {
     // Variant selection complete
     if (isVariantsSelectionDone) {
-      const quantity = quantityElement.value;
+      const quantity = quantityElement?.value ?? 1;
       const submitButton = foxyForm.querySelector("input[type=submit]");
       const inventory =
         variantItems.array.length === 1
@@ -619,7 +619,7 @@ const config = {
             foxyForm.querySelector(`input[name="quantity_max"]`).value =
               variantSelectionCompleteProduct[key];
             // Update max quantity element
-            quantityElement.setAttribute("max", variantSelectionCompleteProduct[key]);
+            quantityElement?.setAttribute("max", variantSelectionCompleteProduct[key]);
             // Update inventory element
             setInventory(isVariantsSelectionDone);
             break;
