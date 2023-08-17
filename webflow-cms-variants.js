@@ -672,9 +672,15 @@ const config = {
 
   function moneyFormat(locale, currency, number) {
     const numericValue = parseFloat(number);
-    const decimalPlaces = numericValue.toString().includes(".")
+    let decimalPlaces = numericValue.toString().includes(".")
       ? numericValue.toString().split(".")[1].length
       : 0;
+
+    const webflowFractionDigits = window?.__WEBFLOW_CURRENCY_SETTINGS?.fractionDigits;
+
+    if (webflowFractionDigits && webflowFractionDigits > decimalPlaces) {
+      decimalPlaces = webflowFractionDigits;
+    }
 
     return new Intl.NumberFormat(locale, {
       style: "currency",
