@@ -1,4 +1,4 @@
-// Foxy Variant Script v1.0.0
+// Foxy Variant Script v1.0.2
 const config = {
   sortBy: "price",
   sortOrder: "ascending",
@@ -317,16 +317,18 @@ const config = {
 
       if (sortedPrices[0] !== sortedPrices[sortedPrices.length - 1]) {
         if (config.priceDisplay === "low") {
-          priceElement.textContent = moneyFormat(config.locale, config.currency, sortedPrices[0]);
+          if (priceElement)
+            priceElement.textContent = moneyFormat(config.locale, config.currency, sortedPrices[0]);
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
         if (config.priceDisplay === "high") {
-          priceElement.textContent = moneyFormat(
-            config.locale,
-            config.currency,
-            sortedPrices[sortedPrices.length - 1]
-          );
+          if (priceElement)
+            priceElement.textContent = moneyFormat(
+              config.locale,
+              config.currency,
+              sortedPrices[sortedPrices.length - 1]
+            );
           priceElement?.classList.remove("w-dyn-bind-empty");
           return;
         }
@@ -336,12 +338,13 @@ const config = {
           config.currency,
           sortedPrices[0]
         )} - ${moneyFormat(config.locale, config.currency, sortedPrices[sortedPrices.length - 1])}`;
-        priceElement.textContent = priceText;
+        if (priceElement) priceElement.textContent = priceText;
         priceElement?.classList.remove("w-dyn-bind-empty");
       } else {
         // Variants that don't affect price
         const price = moneyFormat(config.locale, config.currency, sortedPrices[0]);
-        priceElement.textContent = price;
+        // if priceElement exists, update it
+        if (priceElement) priceElement.textContent = price;
         priceAddToCart.value = price;
       }
     }
