@@ -7,6 +7,7 @@ const config = {
   priceDisplay: "high",
   inventoryDefaultLabel: "Please choose options",
   selectUnavailableLabel: "Unavailable",
+  inventoryControl: true,
 };
 
 (function () {
@@ -248,6 +249,11 @@ const config = {
         radioInput.setAttribute(foxy_variant_group_name, name);
         radioInput.required = true;
 
+        // Add disabled class to options that don't have inventory
+        if (variantOptionData.inventory === undefined) {
+          radioInput.parentElement.classList.add(disableClass);
+        }
+
         const customInput = variantOptionClone.querySelector("div.w-radio-input");
         // Apply any css styles to the current variant option
         customInput ? style(customInput, variantOptionData.styles) : null;
@@ -353,6 +359,9 @@ const config = {
   function setInventory(isVariantsSelectionDone) {
     // Variant selection complete
     if (isVariantsSelectionDone) {
+      // return early if inventory control is disabled
+      if (!config.inventoryControl) return;
+
       const quantity = quantityElement?.value ?? 1;
       const submitButton = foxyForm.querySelector("input[type=submit]");
       const inventory =
@@ -360,13 +369,12 @@ const config = {
           ? variantItems.array[0]?.inventory
           : variantSelectionCompleteProduct?.inventory;
 
-      if (inventory == undefined) return;
-
       if (Number(quantity) > Number(inventory)) {
         quantityElement.value = 1;
       }
 
       if (inventoryElement) {
+        // Update inventory element if ti exists
         if (inventory === undefined) {
           inventoryElement.textContent = "0";
           submitButton.disabled = true;
@@ -386,7 +394,8 @@ const config = {
 
     // First render or variant selection not complete
     if (variantItems.array.length === 1) {
-      addToCartQuantityMax.value = variantItems.array[0]?.inventory ?? 0;
+      if (config.inventoryControl)
+        addToCartQuantityMax.value = variantItems.array[0]?.inventory ?? 0;
       return;
     }
 
@@ -470,9 +479,14 @@ const config = {
     currentVariantSelection,
     selectedProductVariants
   ) {
+    // If inventory control is disabled, adds true to the condition
+    const ifIsInventoryControlEnabled = inventory =>
+      config.inventoryControl ? Number(inventory) > 0 : true;
+
     // More than 1 selected variant
     if (Object.values(selectedProductVariants).length > 1 && !isVariantsSelectionComplete()) {
       return variantItems.array.filter(variant => {
+        const inventory = Number(variant.inventory);
         let isProduct = [];
         Object.keys(selectedProductVariants).forEach(variantOptionKey => {
           variant[variantOptionKey] === selectedProductVariants[variantOptionKey]
@@ -480,7 +494,8 @@ const config = {
             : isProduct.push(false);
         });
         return (
-          isProduct.every(productCheck => productCheck === true) && Number(variant.inventory) > 0
+          isProduct.every(productCheck => productCheck === true) &&
+          ifIsInventoryControlEnabled(inventory)
         );
       });
     }
@@ -488,8 +503,12 @@ const config = {
       // One or none selected variants
       const availableProductsPerVariant = [];
       variantItems.array.forEach(variant => {
+        const inventory = Number(variant.inventory);
         const currentProduct = Object.values(variant);
-        if (currentProduct.includes(currentVariantSelection) && Number(variant.inventory) > 0) {
+        if (
+          currentProduct.includes(currentVariantSelection) &&
+          ifIsInventoryControlEnabled(inventory)
+        ) {
           availableProductsPerVariant.push(variant);
         }
       });
@@ -618,6 +637,9 @@ const config = {
 
         switch (key) {
           case "inventory":
+            if (!config.inventoryControl) {
+              break;
+            }
             // Update max quantity
             foxyForm.querySelector(`input[name="quantity_max"]`).value =
               variantSelectionCompleteProduct[key];
