@@ -256,6 +256,7 @@ const config = {
           variantGroups.length === 1 &&
           !Number(variantOptionData.inventory)
         ) {
+          console.log("radioInput", radioInput);
           radioInput.style.disabled = true;
         }
 
