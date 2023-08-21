@@ -254,7 +254,7 @@ const config = {
         if (
           config.inventoryControl &&
           variantGroups.length === 1 &&
-          variantOptionData.inventory === 0
+          Boolean(variantOptionData.inventory)
         ) {
           radioInput.parentElement.style.disabled = true;
         }
