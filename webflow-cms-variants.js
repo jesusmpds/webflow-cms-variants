@@ -256,7 +256,7 @@ const config = {
           variantGroups.length === 1 &&
           Boolean(variantOptionData.inventory)
         ) {
-          radioInput.parentElement.style.disabled = true;
+          radioInput.style.disabled = true;
         }
 
         const customInput = variantOptionClone.querySelector("div.w-radio-input");
