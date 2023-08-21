@@ -256,8 +256,7 @@ const config = {
           variantGroups.length === 1 &&
           !Number(variantOptionData.inventory)
         ) {
-          console.log("radioInput", radioInput);
-          radioInput.style.disabled = true;
+          radioInput.disabled = true;
         }
 
         const customInput = variantOptionClone.querySelector("div.w-radio-input");
@@ -303,7 +302,7 @@ const config = {
           variantGroups.length === 1 &&
           !Number(variantOptionData.inventory)
         ) {
-          option.style.disabled = true;
+          option.disabled = true;
         }
 
         const selectOption = option;
