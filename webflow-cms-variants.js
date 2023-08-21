@@ -254,7 +254,7 @@ const config = {
         if (
           config.inventoryControl &&
           variantGroups.length === 1 &&
-          Boolean(variantOptionData.inventory)
+          !Number(variantOptionData.inventory)
         ) {
           radioInput.style.disabled = true;
         }
@@ -300,7 +300,7 @@ const config = {
         if (
           config.inventoryControl &&
           variantGroups.length === 1 &&
-          Boolean(variantOptionData.inventory)
+          !Number(variantOptionData.inventory)
         ) {
           option.style.disabled = true;
         }
