@@ -157,6 +157,7 @@ const config = {
         !variantGroupOptions.some(option => option.variantOption === variantOption)
       ) {
         variantGroupOptions.push({
+          inventory: variantItem.inventory,
           label: variantItem.label,
           price: variantItem.price,
           variantOption,
@@ -250,8 +251,12 @@ const config = {
         radioInput.required = true;
 
         // Add disabled class to options that don't have inventory
-        if (variantOptionData.inventory === undefined) {
-          radioInput.parentElement.classList.add(disableClass);
+        if (
+          config.inventoryControl &&
+          variantGroups.length === 1 &&
+          variantOptionData.inventory === 0
+        ) {
+          radioInput.parentElement.style.disabled = true;
         }
 
         const customInput = variantOptionClone.querySelector("div.w-radio-input");
@@ -272,6 +277,7 @@ const config = {
         element,
         name,
         options,
+        optionsData,
         customSortOrder,
         variantOptionDesign,
         variantOptionDesignParent,
@@ -285,6 +291,20 @@ const config = {
       variantSelect.setAttribute(foxy_variant_group_name, name);
 
       variantOptions.forEach(option => {
+        const variantOptionData = optionsData.find(
+          optionData => optionData.variantOption === option
+        );
+
+        // Add disabled class to options that don't have inventory
+        // when variant group is the only one
+        if (
+          config.inventoryControl &&
+          variantGroups.length === 1 &&
+          Boolean(variantOptionData.inventory)
+        ) {
+          option.style.disabled = true;
+        }
+
         const selectOption = option;
         variantSelect.add(new Option(selectOption, selectOption));
       });
