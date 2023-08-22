@@ -549,7 +549,8 @@ const config = {
     let variantGroupsStateChange = false;
 
     otherVariantGroups.forEach(otherVariantGroup => {
-      const { editorElementGroupName, element, variantGroupType, name } = otherVariantGroup;
+      const { editorElementGroupName, element, variantGroupType, name, options } =
+        otherVariantGroup;
       console.log("otherVariantGroup", otherVariantGroup);
       const otherVariantGroupName = capitalizeFirstLetter(
         editorElementGroupName ? editorElementGroupName : name
@@ -557,11 +558,14 @@ const config = {
       // Check if other groups have selections
       const hasSelection = hasVariantSelection(element, variantGroupType);
 
-      const unavailableOptions = getUnavailableOptions(
+      let unavailableOptions = getUnavailableOptions(
         availableProductsPerVariant,
         otherVariantGroup,
         selectedProductVariants
       );
+
+      const availableProductOptions = availableProductsPerVariant.map(e => e[name]);
+      unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
 
       // Disable unavailable options for radio elements or select input elements.
       if (variantGroupType === "radio") {
