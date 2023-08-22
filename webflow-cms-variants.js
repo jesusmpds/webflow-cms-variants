@@ -659,7 +659,7 @@ const config = {
 
       const matches = availableProductsPerVariant.some(variant => {
         const matchingOptions = optionsWithoutCurrentArray.every(
-          optionValue => variant[Object.keys(optionValue)[0]] === Object.values(optionValue)[0]
+          optionValue => variant[optionValue] === optionValue
         );
         return matchingOptions;
       });
