@@ -520,7 +520,7 @@ const config = {
       });
     }
     if (Object.values(selectedProductVariants).length <= 1 || isVariantsSelectionComplete()) {
-      // One or none selected variants
+      // One, or none selected variants or variant selection complete
       const availableProductsPerVariant = [];
       variantItems.array.forEach(variant => {
         const inventory = Number(variant.inventory);
@@ -539,7 +539,8 @@ const config = {
   function updateVariantOptions(
     availableProductsPerVariant,
     variantSelectionGroup,
-    currentVariantSelection
+    currentVariantSelection,
+    selectedProductVariants
   ) {
     const otherVariantGroups = variantGroups.filter(
       variantGroup => variantGroup.name !== variantSelectionGroup
@@ -548,8 +549,7 @@ const config = {
     let variantGroupsStateChange = false;
 
     otherVariantGroups.forEach(otherVariantGroup => {
-      const { editorElementGroupName, element, variantGroupType, name, options } =
-        otherVariantGroup;
+      const { editorElementGroupName, element, variantGroupType, name } = otherVariantGroup;
       console.log("otherVariantGroup", otherVariantGroup);
       const otherVariantGroupName = capitalizeFirstLetter(
         editorElementGroupName ? editorElementGroupName : name
@@ -557,10 +557,11 @@ const config = {
       // Check if other groups have selections
       const hasSelection = hasVariantSelection(element, variantGroupType);
 
-      const availableProductOptions = availableProductsPerVariant.map(e => e[name]);
-
-      const unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
-      console.log("unavailableOptions", unavailableOptions);
+      const unavailableOptions = getUnavailableOptions(
+        availableProductsPerVariant,
+        otherVariantGroup,
+        selectedProductVariants
+      );
 
       // Disable unavailable options for radio elements or select input elements.
       if (variantGroupType === "radio") {
@@ -633,6 +634,39 @@ const config = {
       );
       updateVariantOptions(availableProductsStateChange, variantSelectionGroup);
     }
+  }
+
+  function getUnavailableOptions(
+    availableProductsPerVariant,
+    otherVariantGroup,
+    selectedProductVariants
+  ) {
+    const { editorElementGroupName, element, variantGroupType, name, options } = otherVariantGroup;
+
+    let optionToUnselect = null;
+
+    for (const selectedOptionKey in selectedProductVariants) {
+      const optionsWithoutCurrent = Object.assign({}, selectedProductVariants);
+      delete optionsWithoutCurrent[selectedOptionKey];
+
+      const optionsWithoutCurrentArray = Object.keys(optionsWithoutCurrent).map(
+        optionKey => optionsWithoutCurrent[optionKey]
+      );
+
+      const matches = availableProductsPerVariant.some(variant => {
+        const matchingOptions = optionsWithoutCurrentArray.every(
+          optionValue => variant[Object.keys(optionValue)[0]] === Object.values(optionValue)[0]
+        );
+        return matchingOptions;
+      });
+
+      if (!matches) {
+        optionToUnselect = selectedOptionKey;
+        break;
+      }
+    }
+
+    console.log("Option to unselect:", optionToUnselect);
   }
 
   function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
