@@ -645,7 +645,7 @@ const config = {
     otherVariantGroup,
     selectedProductVariants
   ) {
-    const { editorElementGroupName, element, variantGroupType, name, options } = otherVariantGroup;
+    // const { editorElementGroupName, element, variantGroupType, name, options } = otherVariantGroup;
 
     let optionToUnselect = null;
 
@@ -656,7 +656,7 @@ const config = {
       const optionsWithoutCurrentArray = Object.keys(optionsWithoutCurrent).map(
         optionKey => optionsWithoutCurrent[optionKey]
       );
-
+      console.log("optionsWithoutCurrentArray", optionsWithoutCurrentArray);
       const matches = availableProductsPerVariant.some(variant => {
         const matchingOptions = optionsWithoutCurrentArray.every(
           optionValue => variant[optionValue] === optionValue
