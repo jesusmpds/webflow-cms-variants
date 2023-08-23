@@ -548,6 +548,18 @@ const config = {
     );
     console.log("otherVariantGroups", otherVariantGroups);
     let variantGroupsStateChange = false;
+    const isVariantsSelectionComplete = isVariantsSelectionComplete();
+
+    if (isVariantsSelectionComplete) {
+      // If variant selection complete, filter
+      let unavailableOptions1 = availableProductsPerVariant.filter(variant => {
+        // Check if the selected options match the variant's options
+        return selectedProductVariants.every(
+          selectedOption => variant[selectedOption] === variant[selectedOption]
+        );
+      });
+      console.log("unavailableOptions1", unavailableOptions1);
+    }
 
     otherVariantGroups.forEach(otherVariantGroup => {
       const { editorElementGroupName, element, variantGroupType, name, options } =
@@ -559,14 +571,8 @@ const config = {
       // Check if other groups have selections
       const hasSelection = hasVariantSelection(element, variantGroupType);
 
-      let unavailableOptions = getUnavailableOptions(
-        availableProductsPerVariant,
-        otherVariantGroup,
-        selectedProductVariants
-      );
-
-      const availableProductOptions = availableProductsPerVariant.map(e => e[name]);
-      unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
+      let availableProductOptions = availableProductsPerVariant.map(e => e[name]);
+      let unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
 
       // Disable unavailable options for radio elements or select input elements.
       if (variantGroupType === "radio") {
@@ -639,39 +645,6 @@ const config = {
       );
       updateVariantOptions(availableProductsStateChange, variantSelectionGroup);
     }
-  }
-
-  function getUnavailableOptions(
-    availableProductsPerVariant,
-    otherVariantGroup,
-    selectedProductVariants
-  ) {
-    // const { editorElementGroupName, element, variantGroupType, name, options } = otherVariantGroup;
-
-    let optionToUnselect = null;
-
-    for (const selectedOptionKey in selectedProductVariants) {
-      const optionsWithoutCurrent = Object.assign({}, selectedProductVariants);
-      delete optionsWithoutCurrent[selectedOptionKey];
-
-      const optionsWithoutCurrentArray = Object.keys(optionsWithoutCurrent).map(
-        optionKey => optionsWithoutCurrent[optionKey]
-      );
-      console.log("optionsWithoutCurrentArray", optionsWithoutCurrentArray);
-      const matches = availableProductsPerVariant.some(variant => {
-        const matchingOptions = optionsWithoutCurrentArray.every(
-          optionValue => variant[optionValue] === optionValue
-        );
-        return matchingOptions;
-      });
-
-      if (!matches) {
-        optionToUnselect = selectedOptionKey;
-        break;
-      }
-    }
-
-    console.log("Option to unselect:", optionToUnselect);
   }
 
   function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
