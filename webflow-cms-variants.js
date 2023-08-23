@@ -468,8 +468,7 @@ const config = {
     updateVariantOptions(
       availableProductsPerVariant,
       variantSelectionGroup,
-      currentVariantSelection,
-      selectedProductVariants
+      currentVariantSelection
     );
     updateProductInfo(availableProductsPerVariant, selectedProductVariants);
   }
@@ -540,26 +539,13 @@ const config = {
   function updateVariantOptions(
     availableProductsPerVariant,
     variantSelectionGroup,
-    currentVariantSelection,
-    selectedProductVariants
+    currentVariantSelection
   ) {
     const otherVariantGroups = variantGroups.filter(
       variantGroup => variantGroup.name !== variantSelectionGroup
     );
     console.log("otherVariantGroups", otherVariantGroups);
     let variantGroupsStateChange = false;
-
-    // if (isVariantsSelectionComplete() && !availableProductsPerVariant.length) {
-    //   // If variant selection complete and no available products get the values from the selectedProductVariants object that are not the variantSelectionGroup
-    //   const otherVariantGroupsValues = Object.values(selectedProductVariants).filter(
-    //     variant => variant !== currentVariantSelection
-    //   );
-    //   // Get the variant group that has the other variant group value
-    //   const otherVariantGroup = variantGroups.find(variantGroup =>
-    //     otherVariantGroupsValues.includes(variantGroup.options[0])
-    //   );
-
-    // }
 
     otherVariantGroups.forEach(otherVariantGroup => {
       const { editorElementGroupName, element, variantGroupType, name, options } =
