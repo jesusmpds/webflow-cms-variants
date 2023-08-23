@@ -505,7 +505,7 @@ const config = {
       config.inventoryControl ? Number(inventory) > 0 : true;
 
     // More than 1 selected variant
-    if (Object.values(selectedProductVariants).length > 1 && !isVariantsSelectionComplete()) {
+    if (Object.values(selectedProductVariants).length > 1) {
       return variantItems.array.filter(variant => {
         const inventory = Number(variant.inventory);
         let isProduct = [];
@@ -520,7 +520,7 @@ const config = {
         );
       });
     }
-    if (Object.values(selectedProductVariants).length <= 1 || isVariantsSelectionComplete()) {
+    if (Object.values(selectedProductVariants).length <= 1) {
       // One, or none selected variants or variant selection complete
       const availableProductsPerVariant = [];
       variantItems.array.forEach(variant => {
@@ -548,18 +548,18 @@ const config = {
     );
     console.log("otherVariantGroups", otherVariantGroups);
     let variantGroupsStateChange = false;
-    const variantsSelectionComplete = isVariantsSelectionComplete();
 
-    if (variantsSelectionComplete) {
-      // If variant selection complete, filter
-      let unavailableOptions1 = availableProductsPerVariant.filter(variant => {
-        // Check if the selected options match the variant's options
-        return Object.entries(selectedProductVariants).every(
-          ([variantKey, variantValue]) => variantValue === variant[variantKey]
-        );
-      });
-      console.log("unavailableOptions1", unavailableOptions1);
-    }
+    // if (isVariantsSelectionComplete() && !availableProductsPerVariant.length) {
+    //   // If variant selection complete and no available products get the values from the selectedProductVariants object that are not the variantSelectionGroup
+    //   const otherVariantGroupsValues = Object.values(selectedProductVariants).filter(
+    //     variant => variant !== currentVariantSelection
+    //   );
+    //   // Get the variant group that has the other variant group value
+    //   const otherVariantGroup = variantGroups.find(variantGroup =>
+    //     otherVariantGroupsValues.includes(variantGroup.options[0])
+    //   );
+
+    // }
 
     otherVariantGroups.forEach(otherVariantGroup => {
       const { editorElementGroupName, element, variantGroupType, name, options } =
@@ -573,7 +573,7 @@ const config = {
 
       let availableProductOptions = availableProductsPerVariant.map(e => e[name]);
       let unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
-
+      console.log("unavailableOptions for ", name, unavailableOptions);
       // Disable unavailable options for radio elements or select input elements.
       if (variantGroupType === "radio") {
         //Remove disabled
