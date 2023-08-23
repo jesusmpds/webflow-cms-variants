@@ -468,7 +468,8 @@ const config = {
     updateVariantOptions(
       availableProductsPerVariant,
       variantSelectionGroup,
-      currentVariantSelection
+      currentVariantSelection,
+      selectedProductVariants
     );
     updateProductInfo(availableProductsPerVariant, selectedProductVariants);
   }
