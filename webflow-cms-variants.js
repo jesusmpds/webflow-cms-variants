@@ -548,9 +548,9 @@ const config = {
     );
     console.log("otherVariantGroups", otherVariantGroups);
     let variantGroupsStateChange = false;
-    const isVariantsSelectionComplete = isVariantsSelectionComplete();
+    const variantsSelectionComplete = isVariantsSelectionComplete();
 
-    if (isVariantsSelectionComplete) {
+    if (variantsSelectionComplete) {
       // If variant selection complete, filter
       let unavailableOptions1 = availableProductsPerVariant.filter(variant => {
         // Check if the selected options match the variant's options
