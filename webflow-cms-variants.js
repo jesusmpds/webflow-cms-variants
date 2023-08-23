@@ -554,8 +554,8 @@ const config = {
       // If variant selection complete, filter
       let unavailableOptions1 = availableProductsPerVariant.filter(variant => {
         // Check if the selected options match the variant's options
-        return selectedProductVariants.every(
-          selectedOption => variant[selectedOption] === variant[selectedOption]
+        return Object.entries(selectedProductVariants).every(
+          ([variantKey, variantValue]) => variantValue === variant[variantKey]
         );
       });
       console.log("unavailableOptions1", unavailableOptions1);
