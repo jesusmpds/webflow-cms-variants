@@ -1,4 +1,4 @@
-// Foxy Variant Script v1.0.2
+// Foxy Variant Script v1.0.3
 const config = {
   sortBy: "price",
   sortOrder: "ascending",
@@ -363,7 +363,7 @@ const config = {
           config.locale,
           config.currency,
           sortedPrices[0]
-        )} - ${moneyFormat(config.locale, config.currency, sortedPrices[sortedPrices.length - 1])}`;
+        )}–${moneyFormat(config.locale, config.currency, sortedPrices[sortedPrices.length - 1])}`;
         if (priceElement) priceElement.textContent = priceText;
         priceElement?.classList.remove("w-dyn-bind-empty");
       } else {
