@@ -603,7 +603,14 @@ const config = {
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options and unavailable text from config
           unavailableOptions.forEach(option => {
-            const selectOption = element.querySelector(`select option[value="${option}"]`);
+            let sanitizedOption = option;
+            if (option.contains('"') || option.contains("'")) {
+              // remove quotes from option
+              sanitizedOption = option.replace(/['"]+/g, "");
+            }
+            const selectOption = element.querySelector(
+              `select option[value*="${sanitizedOption}"]`
+            );
             const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
             selectOption.classList.add(disableOptionClass);
             if (config.selectUnavailableLabel) {
