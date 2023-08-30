@@ -604,7 +604,7 @@ const config = {
           // Add disabled class to unavailable options and unavailable text from config
           unavailableOptions.forEach(option => {
             let sanitizedOption = option;
-            if (option.contains('"') || option.contains("'")) {
+            if (option.includes('"') || option.includes("'")) {
               // remove quotes from option
               sanitizedOption = option.replace(/['"]+/g, "");
             }
