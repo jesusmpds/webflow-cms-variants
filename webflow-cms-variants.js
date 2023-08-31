@@ -569,14 +569,18 @@ const config = {
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options
           unavailableOptions.forEach(option => {
-            const variantOption = option;
-            const radioInput = element.querySelector(`input[value="${variantOption}"]`);
+            let sanitizedOption = option;
+            if (option.includes('"') || option.includes("'")) {
+              // remove quotes from option
+              sanitizedOption = option.replace(/['"]+/g, "");
+            }
+            const radioInput = element.querySelector(`input[value*="${sanitizedOption}"]`);
             radioInput.parentElement.classList.add(disableClass);
 
             // if variant group already has a selection
             if (hasSelection) {
               const unavailableElement = element.querySelector(
-                `input[value="${variantOption}"]:checked`
+                `input[value*="${sanitizedOption}"]:checked`
               );
               if (unavailableElement) {
                 unavailableElement.checked = false;
