@@ -678,11 +678,12 @@ const config = {
             setInventory(isVariantsSelectionDone);
             break;
           case "price":
-            priceElement.textContent = moneyFormat(
-              config.locale,
-              config.currency,
-              variantSelectionCompleteProduct[key]
-            );
+            if (priceElement)
+              priceElement.textContent = moneyFormat(
+                config.locale,
+                config.currency,
+                variantSelectionCompleteProduct[key]
+              );
             break;
           case "image":
             // Remove srcset from primary image element
