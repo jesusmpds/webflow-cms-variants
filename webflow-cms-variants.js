@@ -703,7 +703,7 @@ const config = {
   // Utils
 
   function isVariantsSelectionComplete() {
-    if (foxyForm.querySelectorAll("[required]:invalid").length === 0) {
+    if (foxyForm.querySelectorAll("[foxy-variant-group] [required]:invalid").length === 0) {
       return true;
     }
     return false;
