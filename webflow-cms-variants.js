@@ -294,7 +294,7 @@ const config = {
         const variantOptionData = optionsData.find(
           optionData => optionData.variantOption === option
         );
-
+        let selectOption = new Option(option, option);
         // Add disabled class to options that don't have inventory
         // when variant group is the only one
         if (
@@ -302,11 +302,13 @@ const config = {
           variantGroups.length === 1 &&
           !Number(variantOptionData.inventory)
         ) {
-          option.disabled = true;
+          let unavailableText;
+          if (config.selectUnavailableLabel) unavailableText = `(${config.selectUnavailableLabel})`;
+          selectOption = new Option(`${option} ${unavailableText}`, option);
+          selectOption.disabled = true;
         }
 
-        const selectOption = option;
-        variantSelect.add(new Option(selectOption, selectOption));
+        variantSelect.add(selectOption);
       });
 
       // Add select to variant group container
