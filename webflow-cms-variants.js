@@ -1,13 +1,13 @@
 // Foxy Variant Script v1.0.4
 const config = {
-  sortBy: "price",
-  sortOrder: "ascending",
+  sortBy: "",
+  sortOrder: "",
   locale: "en-US",
   currency: "USD",
-  priceDisplay: "high",
+  priceDisplay: "low",
   inventoryDefaultLabel: "Please choose options",
   selectUnavailableLabel: "Unavailable",
-  inventoryControl: true,
+  inventoryControl: false,
 };
 
 (function () {
