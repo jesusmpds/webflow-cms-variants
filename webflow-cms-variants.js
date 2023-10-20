@@ -432,7 +432,7 @@ const config = {
 
   function handleVariantSelection(e) {
     const targetElement = e.target;
-    const { nodeName, value } = targetElement;
+    const { value } = targetElement;
     // Selecting the default select option returns early.
     if (!value) return;
 
@@ -442,19 +442,7 @@ const config = {
     const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
     const currentVariantSelection = value;
 
-    // Remove disabled class from current selections
-    if (nodeName === "INPUT") {
-      targetElement.parentElement.classList.remove(disableClass);
-    } else if (nodeName === "SELECT") {
-      targetElement.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
-        option.classList.remove(disableOptionClass);
-
-        // Get the option textContent split it by the unavailable text and remove it
-        const unavailableText = ` (${config.selectUnavailableLabel})`;
-        const optionText = option.textContent.split(unavailableText)[0];
-        option.textContent = optionText;
-      });
-    }
+    removeDisabledStyleVariantGroupOptions(targetElement);
 
     const selectedProductVariants = getSelectedVariantOptions();
 
@@ -473,6 +461,25 @@ const config = {
       currentVariantSelection
     );
     updateProductInfo(availableProductsPerVariant, selectedProductVariants);
+  }
+
+  function removeDisabledStyleVariantGroupOptions(targetElement) {
+    // Remove disabled class from current selections
+    if (targetElement.nodeName === "INPUT") {
+      const variantGroupContainer = targetElement.closest(`[${foxy_variant_group}]`);
+
+      variantGroupContainer
+        .querySelectorAll(`.${disableClass}`)
+        .forEach(input => input.classList.remove(disableClass));
+    } else if (targetElement.nodeName === "SELECT") {
+      targetElement.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
+        option.classList.remove(disableOptionClass);
+        // Get the option textContent split it by the unavailable text and remove it
+        const unavailableText = ` (${config.selectUnavailableLabel})`;
+        const optionText = option.textContent.split(unavailableText)[0];
+        option.textContent = optionText;
+      });
+    }
   }
 
   function getSelectedVariantOptions() {
