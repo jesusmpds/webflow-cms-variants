@@ -433,6 +433,8 @@ const config = {
   function handleVariantSelection(e) {
     const targetElement = e.target;
     const { value } = targetElement;
+    const currentVariantSelectionElement = targetElement;
+    const currentVariantSelection = value;
     // Selecting the default select option returns early.
     if (!value) return;
 
@@ -440,10 +442,8 @@ const config = {
     if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
 
     const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
-    const currentVariantSelectionElement = targetElement;
-    const currentVariantSelection = value;
 
-    removeDisabledStyleVariantGroupOptions(targetElement, false);
+    removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, false);
 
     const selectedProductVariants = getSelectedVariantOptions();
 
