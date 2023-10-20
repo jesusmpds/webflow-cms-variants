@@ -440,9 +440,10 @@ const config = {
     if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
 
     const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
+    const currentVariantSelectionElement = targetElement;
     const currentVariantSelection = value;
 
-    removeDisabledStyleVariantGroupOptions(targetElement);
+    removeDisabledStyleVariantGroupOptions(targetElement, false);
 
     const selectedProductVariants = getSelectedVariantOptions();
 
@@ -458,27 +459,36 @@ const config = {
     updateVariantOptions(
       availableProductsPerVariant,
       variantSelectionGroup,
-      currentVariantSelection
+      currentVariantSelectionElement
     );
     updateProductInfo(availableProductsPerVariant, selectedProductVariants);
   }
 
-  function removeDisabledStyleVariantGroupOptions(targetElement) {
+  function removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, resetChoices) {
+    const { nodeName } = currentVariantSelectionElement;
     // Remove disabled class from current selections
-    if (targetElement.nodeName === "INPUT") {
-      const variantGroupContainer = targetElement.closest(`[${foxy_variant_group}]`);
+    // if resetChoices then this removal is coming from a variant options update with variantGroupsStateChange
+    if (nodeName === "INPUT") {
+      currentVariantSelectionElement.parentElement.classList.remove(disableClass);
 
-      variantGroupContainer
-        .querySelectorAll(`.${disableClass}`)
-        .forEach(input => input.classList.remove(disableClass));
-    } else if (targetElement.nodeName === "SELECT") {
-      targetElement.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
-        option.classList.remove(disableOptionClass);
-        // Get the option textContent split it by the unavailable text and remove it
-        const unavailableText = ` (${config.selectUnavailableLabel})`;
-        const optionText = option.textContent.split(unavailableText)[0];
-        option.textContent = optionText;
-      });
+      if (resetChoices) {
+        const variantGroupContainer = currentVariantSelectionElement.closest(
+          `[${foxy_variant_group}]`
+        );
+        variantGroupContainer
+          .querySelectorAll(`.${disableClass}`)
+          .forEach(input => input.classList.remove(disableClass));
+      }
+    } else if (nodeName === "SELECT") {
+      currentVariantSelectionElement
+        .querySelectorAll(`select option.${disableOptionClass}`)
+        .forEach(option => {
+          option.classList.remove(disableOptionClass);
+          // Get the option textContent split it by the unavailable text and remove it
+          const unavailableText = ` (${config.selectUnavailableLabel})`;
+          const optionText = option.textContent.split(unavailableText)[0];
+          option.textContent = optionText;
+        });
     }
   }
 
@@ -548,7 +558,7 @@ const config = {
   function updateVariantOptions(
     availableProductsPerVariant,
     variantSelectionGroup,
-    currentVariantSelection
+    currentVariantSelectionElement
   ) {
     const otherVariantGroups = variantGroups.filter(
       variantGroup => variantGroup.name !== variantSelectionGroup
@@ -643,10 +653,12 @@ const config = {
 
     // Update variant groups state
     if (variantGroupsStateChange) {
+      removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, true);
+
       const selectedProductVariants = getSelectedVariantOptions();
 
       const availableProductsStateChange = getAvailableProductsPerVariantSelection(
-        currentVariantSelection,
+        currentVariantSelectionElement.value,
         selectedProductVariants
       );
       updateVariantOptions(availableProductsStateChange, variantSelectionGroup);
