@@ -523,7 +523,7 @@ const config = {
       config.inventoryControl ? Number(inventory) > 0 : true;
 
     // More than 1 selected variant
-    if (Object.values(selectedProductVariants).length > 1) {
+    if (variantGroups.length > 2) {
       return variantItems.array.filter(variant => {
         const inventory = Number(variant.inventory);
         let isProduct = [];
@@ -538,7 +538,7 @@ const config = {
         );
       });
     }
-    if (Object.values(selectedProductVariants).length <= 1) {
+    if (variantGroups.length <= 2) {
       // One, or none selected variants or variant selection complete
       const availableProductsPerVariant = [];
       variantItems.array.forEach(variant => {
