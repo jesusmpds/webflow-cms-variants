@@ -1,4 +1,4 @@
-// Foxy Variant Script v1.0.5
+// Foxy Variant Script v1.0.6
 const config = {
   sortBy: "",
   sortOrder: "",
