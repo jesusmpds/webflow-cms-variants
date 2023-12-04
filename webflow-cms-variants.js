@@ -682,7 +682,7 @@ const config = {
       // Update Hidden Add to Cart Inputs with Variant Data and
       //DOM customer facing elements with product info
       Object.keys(variantSelectionCompleteProduct).forEach(key => {
-        const inputToUpdate = foxyForm.querySelector(`input[name="${key}"]`);
+        const inputToUpdate = foxyForm.querySelector(`input[type='hidden'][name="${key}"]`);
         if (inputToUpdate) inputToUpdate.value = variantSelectionCompleteProduct[key];
 
         switch (key) {
