@@ -174,18 +174,18 @@ const config = {
     const { sortBy, sortOrder } = config;
 
     const compareFn = (a, b) => {
-      if (sortBy === "Price") {
+      if (sortBy === "price") {
         const priceA = a.price;
         const priceB = b.price;
 
         return sortOrder === "Descending" ? priceB - priceA : priceA - priceB;
-      } else if (sortBy === "Label") {
+      } else if (sortBy === "label") {
         const labelA = a.label;
         const labelB = b.label;
 
-        if (sortOrder === "Descending") {
+        if (sortOrder === "descending") {
           return labelB.localeCompare(labelA);
-        } else if (sortOrder === "Ascending") {
+        } else if (sortOrder === "ascending") {
           return labelA.localeCompare(labelB);
         }
       }
@@ -201,9 +201,9 @@ const config = {
         const labelA = a.variantOption;
         const labelB = b.variantOption;
 
-        if (sortOrder === "Descending") {
+        if (sortOrder === "descending") {
           return labelB.localeCompare(labelA);
-        } else if (sortOrder === "Ascending") {
+        } else if (sortOrder === "ascending") {
           return labelA.localeCompare(labelB);
         }
         // If sortOrder is not specified, return 0 to maintain original order

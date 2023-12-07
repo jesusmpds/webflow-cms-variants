@@ -50,7 +50,7 @@ For real time price change on variant selection the price element must have the 
 
 `foxy-id="price"`
 
-## Stock
+## Inventory
 
 For stock change functionality the stock element needs to have the custom element:
 
