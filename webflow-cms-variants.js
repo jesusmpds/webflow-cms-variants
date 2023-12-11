@@ -593,6 +593,7 @@ const config = {
               // remove quotes from option
               sanitizedOption = option.replace(/['"]+/g, "");
             }
+
             const radioInput = element.querySelector(`input[value*="${sanitizedOption}"]`);
             radioInput.parentElement.classList.add(disableClass);
 
@@ -626,19 +627,14 @@ const config = {
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options and unavailable text from config
           unavailableOptions.forEach(option => {
-            let sanitizedOption = option;
-            if (option.includes('"') || option.includes("'")) {
-              // remove quotes from option
-              sanitizedOption = option.replace(/['"]+/g, "");
-            }
-            const selectOption = element.querySelector(
-              `select option[value*="${sanitizedOption}"]`
-            );
+            const selectOptions = element.querySelector("select")?.options;
+
+            const exactMatchOption = Array.from(selectOptions).find(opt => opt.value === option);
             const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
-            selectOption.classList.add(disableOptionClass);
+            exactMatchOption.classList.add(disableOptionClass);
             if (config.selectUnavailableLabel) {
               const unavailableText = `(${config.selectUnavailableLabel})`;
-              selectOption.textContent = `${selectOption.textContent} ${unavailableText}`;
+              exactMatchOption.textContent = `${exactMatchOption.textContent} ${unavailableText}`;
             }
 
             // if variant group already has a selection
