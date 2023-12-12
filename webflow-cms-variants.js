@@ -590,20 +590,18 @@ const config = {
           // TODO finish this loop all inputs and check for value insteadof css selector
           console.log("element for radio", element);
           unavailableOptions.forEach(option => {
-            let sanitizedOption = option;
-            if (option.includes('"') || option.includes("'")) {
-              // remove quotes from option
-              sanitizedOption = option.replace(/['"]+/g, "");
-            }
+            const radioElements = element.querySelectorAll("input[type='radio']");
 
-            const radioInput = element.querySelector(`input[value*="${sanitizedOption}"]`);
-            radioInput.parentElement.classList.add(disableClass);
+            const exactMatchOptionInput = Array.from(radioElements).find(
+              input => input.value === option
+            );
+
+            exactMatchOptionInput.parentElement.classList.add(disableClass);
 
             // if variant group already has a selection
             if (hasSelection) {
-              const unavailableElement = element.querySelector(
-                `input[value*="${sanitizedOption}"]:checked`
-              );
+              const unavailableElement =
+                exactMatchOptionInput.checked === true ? exactMatchOptionInput : false;
               if (unavailableElement) {
                 unavailableElement.checked = false;
                 unavailableElement.parentElement.classList.add(disableClass);
