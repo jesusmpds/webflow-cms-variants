@@ -587,6 +587,8 @@ const config = {
         });
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options
+          // TODO finish this loop all inputs and check for value insteadof css selector
+          console.log("element for radio", element);
           unavailableOptions.forEach(option => {
             let sanitizedOption = option;
             if (option.includes('"') || option.includes("'")) {
