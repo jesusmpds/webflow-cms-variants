@@ -1,4 +1,4 @@
-// Foxy Variant Script v1.0.6
+// Foxy Variant Script v1.0.7
 const config = {
   sortBy: "",
   sortOrder: "",
@@ -7,7 +7,7 @@ const config = {
   priceDisplay: "low",
   inventoryDefaultLabel: "Please choose options",
   selectUnavailableLabel: "Unavailable",
-  inventoryControl: false,
+  inventoryControl: false, // Boolean. Values either true or false
 };
 
 (function () {
