@@ -7,7 +7,8 @@ const config = {
   priceDisplay: "low",
   inventoryDefaultLabel: "Please choose options",
   selectUnavailableLabel: "Unavailable",
-  inventoryControl: false, // Boolean. Values either true or false
+  inventoryControl: false,
+  multiCurrency: true,
 };
 
 (function () {
@@ -69,7 +70,18 @@ const config = {
 
         if (name.includes("foxy-variant") && value) {
           const key = sanitize(name.split("foxy-variant-")[1]);
+          const currency = sanitize(config.currency);
+
           if (!acc[key]) {
+            // Handle multi-currency scenario
+            if (config.multiCurrency && key === `price-${currency}`) {
+              acc["price"] = value.trim();
+              return acc;
+            }
+
+            if (config.multiCurrency && key.includes("price") && key !== `price-${currency}`)
+              return acc;
+
             acc[key === "sku" ? "code" : key] = value.trim();
           }
           return acc;
@@ -334,7 +346,14 @@ const config = {
 
   function addPrice() {
     //--- Product doesn't have variants---
-    if (variantItems.array.length === 1) return;
+    if (variantItems.array.length <= 1) {
+      if (priceElement)
+        priceElement.textContent = moneyFormat(
+          config.locale,
+          config.currency,
+          priceElement.textContent
+        );
+    }
 
     //--- Product has variants---
     if (variantItems.array.length > 1) {
@@ -587,7 +606,6 @@ const config = {
         });
         if (unavailableOptions.length !== 0) {
           // Add disabled class to unavailable options
-          // TODO finish this loop all inputs and check for value insteadof css selector
           console.log("element for radio", element);
           unavailableOptions.forEach(option => {
             const radioElements = element.querySelectorAll("input[type='radio']");
