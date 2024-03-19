@@ -55,7 +55,8 @@ function multiCurrencyHandling() {
       return function () {
         existingOnLoad();
 
-        FC.client.on("ready.done", multiCurrencyHandling).then(() => init());
+        FC.client.on("ready.done", multiCurrencyHandling);
+        FC.client.on("ready.done", init());
       };
     })();
     return;
