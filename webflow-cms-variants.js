@@ -11,7 +11,7 @@ const config = {
   multiCurrency: true,
 };
 
-function multiCurrencyHandling() {
+function multiCurrencyHandling(FC) {
   const country = FC.json.shipping_address.country;
   let template_set;
   if (country == "AR") {
@@ -48,17 +48,22 @@ function multiCurrencyHandling() {
   const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
 
   if (config.multiCurrency) {
+    console.log("MULTICURRENCY");
     var FC = FC || {};
 
-    FC.onLoad = (function () {
-      const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
-      return function () {
-        existingOnLoad();
+    // FC.onLoad = (function () {
+    //   const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
+    //   return function () {
+    //     existingOnLoad();
 
-        FC.client.on("ready.done", multiCurrencyHandling);
-        FC.client.on("ready.done", init());
-      };
-    })();
+    //     FC.client.on("ready.done", multiCurrencyHandling(FC));
+    //     FC.client.on("ready.done", init());
+    //   };
+    // })();
+    // return;
+
+    multiCurrencyHandling(FC);
+    init();
     return;
   }
 
