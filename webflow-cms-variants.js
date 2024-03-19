@@ -11,6 +11,22 @@ const config = {
   multiCurrency: true,
 };
 
+function multiCurrencyHandling() {
+  const country = FC.json.shipping_address.country;
+  let template_set;
+  if (country == "AR") {
+    template_set = "EUR";
+    config.locale = "es-ES";
+    config.currency = "EUR";
+  } else {
+    template_set = "DEFAULT";
+  }
+  var existing_template_set = FC.json.template_set == "" ? "DEFAULT" : FC.json.template_set;
+  if (existing_template_set != template_set) {
+    FC.client.request("https://" + FC.settings.storedomain + "/cart?template_set=" + template_set);
+  }
+}
+
 (function () {
   // Constants and variables
   const disableClass = "foxy-disable";
@@ -30,6 +46,20 @@ const config = {
   const priceAddToCart = foxyForm.querySelector("input[name='price']");
   const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
   const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
+
+  if (config.multiCurrency) {
+    var FC = FC || {};
+
+    FC.onLoad = (function () {
+      const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
+      return function () {
+        existingOnLoad();
+
+        FC.client.on("ready.done", multiCurrencyHandling).then(() => init());
+      };
+    })();
+    return;
+  }
 
   function init() {
     //Insert disabled class styles
