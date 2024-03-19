@@ -53,11 +53,11 @@ function multiCurrencyHandling(FC) {
 
     FC.onLoad = function () {
       const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
-      return function () {
+      
         existingOnLoad();
 
         FC.client.on("ready.done", init());
-      };
+      }
     };
     return;
   }
