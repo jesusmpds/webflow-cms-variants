@@ -51,9 +51,8 @@ function multiCurrencyHandling() {
 
   if (config.multiCurrency) {
     console.log("MULTICURRENCY");
-
+    let FC = FC || {};
     FC.onLoad = (function () {
-      let FC = FC || {};
       const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
       return function () {
         existingOnLoad();
