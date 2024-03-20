@@ -13,7 +13,7 @@ const config = {
 };
 
 function multiCurrencyHandling() {
-  let FC = FC || {};
+  var FC = FC || {};
   const country = FC.json.shipping_address.country;
   let template_set;
   if (country == "AR") {
@@ -51,7 +51,7 @@ function multiCurrencyHandling() {
 
   if (config.multiCurrency) {
     console.log("MULTICURRENCY");
-    let FC = FC || {};
+    var FC = FC || {};
     FC.onLoad = (function () {
       const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
       return function () {
