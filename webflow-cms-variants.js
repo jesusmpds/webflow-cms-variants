@@ -1,4 +1,6 @@
 // Foxy Variant Script v1.1.0
+let FC = FC || {};
+
 const config = {
   sortBy: "",
   sortOrder: "",
@@ -11,7 +13,7 @@ const config = {
   multiCurrency: true,
 };
 
-function multiCurrencyHandling(FC) {
+function multiCurrencyHandling() {
   const country = FC.json.shipping_address.country;
   let template_set;
   if (country == "AR") {
@@ -49,17 +51,15 @@ function multiCurrencyHandling(FC) {
 
   if (config.multiCurrency) {
     console.log("MULTICURRENCY");
-    var FC = FC || {};
 
-    FC.onLoad = function () {
+    FC.onLoad = (function () {
       const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
-      
+      return function () {
         existingOnLoad();
 
-        FC.client.on("ready.done", init());
-      }
-    };
-    return;
+        FC.client.on("ready.done", multiCurrencyHandling);
+      };
+    })();
   }
 
   function init() {
@@ -75,8 +75,6 @@ function multiCurrencyHandling(FC) {
     quantityElement?.setAttribute("value", "1");
     quantityElement?.setAttribute("min", "1");
 
-    // Check for multicurrency
-    multiCurrencyHandling(FC);
     // Build variant list info into variable
     buildVariantList();
     // Build variant group list info into variable
