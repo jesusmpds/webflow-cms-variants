@@ -1,6 +1,6 @@
 function multiCurrencyLogic() {
   // Multi-CurrencyLogic Scenarios
-
+  let template_set;
   // Customer currency by URL Path
   const currentPagePath = window.location.pathname;
   if (currentPagePath.includes("/es/")) {
@@ -13,7 +13,7 @@ function multiCurrencyLogic() {
 
   // Customer country by IP
   const country = FC.json.shipping_address.country;
-  let template_set;
+
   if (country == "AR") {
     template_set = "EUR";
     config.locale = "es-ES";
