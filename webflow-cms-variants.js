@@ -11,21 +11,6 @@ const config = {
   multiCurrency: true,
 };
 
-function multiCurrencyLogic() {
-  const country = FC.json.shipping_address.country;
-  let template_set;
-  if (country == "AR") {
-    template_set = "EUR";
-    config.locale = "es-ES";
-    config.currency = "EUR";
-  } else {
-    template_set = "DEFAULT";
-  }
-  var existing_template_set = FC.json.template_set == "" ? "DEFAULT" : FC.json.template_set;
-  if (existing_template_set != template_set) {
-    FC.client.request("https://" + FC.settings.storedomain + "/cart?template_set=" + template_set);
-  }
-}
 var FC = FC || {};
 (function () {
   // Constants and variables
