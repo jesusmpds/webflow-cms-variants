@@ -1,5 +1,4 @@
 // Foxy Variant Script v1.1.0
-
 const config = {
   sortBy: "",
   sortOrder: "",
@@ -12,8 +11,7 @@ const config = {
   multiCurrency: true,
 };
 
-function multiCurrencyHandling() {
-  var FC = FC || {};
+function multiCurrencyLogic() {
   const country = FC.json.shipping_address.country;
   let template_set;
   if (country == "AR") {
@@ -28,7 +26,7 @@ function multiCurrencyHandling() {
     FC.client.request("https://" + FC.settings.storedomain + "/cart?template_set=" + template_set);
   }
 }
-
+var FC = FC || {};
 (function () {
   // Constants and variables
   const disableClass = "foxy-disable";
@@ -50,16 +48,12 @@ function multiCurrencyHandling() {
   const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
 
   if (config.multiCurrency) {
-    console.log("MULTICURRENCY");
-    var FC = FC || {};
-    FC.onLoad = (function () {
-      const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
-      return function () {
-        existingOnLoad();
-
-        FC.client.on("ready.done", multiCurrencyHandling);
-      };
-    })();
+    const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
+    FC.onLoad = function () {
+      existingOnLoad();
+      FC.client.on("ready.done", multiCurrencyLogic).on("ready.done", init);
+    };
+    return;
   }
 
   function init() {
@@ -826,4 +820,4 @@ function multiCurrencyHandling() {
 
   // Initialization
   init();
-})();
+})(FC);
