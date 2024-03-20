@@ -1,5 +1,4 @@
 // Foxy Variant Script v1.1.0
-let FC = FC || {};
 
 const config = {
   sortBy: "",
@@ -14,6 +13,7 @@ const config = {
 };
 
 function multiCurrencyHandling() {
+  let FC = FC || {};
   const country = FC.json.shipping_address.country;
   let template_set;
   if (country == "AR") {
@@ -53,6 +53,7 @@ function multiCurrencyHandling() {
     console.log("MULTICURRENCY");
 
     FC.onLoad = (function () {
+      let FC = FC || {};
       const existingOnLoad = typeof FC.onLoad == "function" ? FC.onLoad : function () {};
       return function () {
         existingOnLoad();
