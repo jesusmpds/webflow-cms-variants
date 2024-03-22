@@ -279,6 +279,7 @@ var FC = FC || {};
           !Number(variantOptionData.inventory)
         ) {
           radioInput.disabled = true;
+          radioInput.parentElement.classList.add(disableClass);
         }
 
         const customInput = variantOptionClone.querySelector("div.w-radio-input");

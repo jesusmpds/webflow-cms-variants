@@ -1,10 +1,11 @@
 function multiCurrencyLogic() {
-  // Multi-CurrencyLogic Scenarios
+  // Multi-Currency Logic Scenarios
   let template_set;
   // Customer currency by URL Path
   const currentPagePath = window.location.pathname;
   if (currentPagePath.includes("/es/")) {
     template_set = "EUR";
+    // Add the right locale and currency code here if the condition is met.
     config.locale = "es-ES";
     config.currency = "EUR";
   } else {
