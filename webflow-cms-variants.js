@@ -127,7 +127,10 @@ var Foxy = (function () {
 
     function handleAddons() {
       let templateSet = "DEFAULT";
-      const newConfig = { defaultCurrency: "", defaultLocale: "" };
+      const newConfig = {
+        defaultCurrency: config.defaultCurrency,
+        defaultLocale: config.defaultLocale,
+      };
       const currentPage = window.location.href;
       // Get templateSet from URL
       const templateSetFromURL = getTemplateSetFromURL(currentPage, config);
