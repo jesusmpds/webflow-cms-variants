@@ -218,7 +218,7 @@ var Foxy = (function () {
 
           if (name.includes("foxy-variant") && value) {
             const key = sanitize(name.split("foxy-variant-")[1]);
-            const currency = sanitize(config.currency);
+            const currency = sanitize(config.defaultCurrency);
 
             if (!acc[key]) {
               // Handle multi-currency scenario
