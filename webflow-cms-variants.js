@@ -26,7 +26,7 @@ const config = {
     templateChangeBySubdirectory: false,
     templateChangeBySubdomain: false,
     webflowLocalization: false,
-    weglotJavascriptIntegration: false,
+    weglotJavascriptIntegration: true,
   },
 };
 
@@ -525,8 +525,8 @@ var Foxy = (function () {
       if (variantItems.array.length <= 1) {
         if (priceElement)
           priceElement.textContent = moneyFormat(
-            config.locale,
-            config.currency,
+            config.defaultLocale,
+            config.defaultCurrency,
             priceElement.textContent
           );
       }
@@ -542,8 +542,8 @@ var Foxy = (function () {
           if (config.priceDisplay === "low") {
             if (priceElement)
               priceElement.textContent = moneyFormat(
-                config.locale,
-                config.currency,
+                config.defaultLocale,
+                config.defaultCurrency,
                 sortedPrices[0]
               );
             priceElement?.classList.remove("w-dyn-bind-empty");
@@ -552,8 +552,8 @@ var Foxy = (function () {
           if (config.priceDisplay === "high") {
             if (priceElement)
               priceElement.textContent = moneyFormat(
-                config.locale,
-                config.currency,
+                config.defaultLocale,
+                config.defaultCurrency,
                 sortedPrices[sortedPrices.length - 1]
               );
             priceElement?.classList.remove("w-dyn-bind-empty");
@@ -561,15 +561,19 @@ var Foxy = (function () {
           }
 
           const priceText = `${moneyFormat(
-            config.locale,
-            config.currency,
+            config.defaultLocale,
+            config.defaultCurrency,
             sortedPrices[0]
-          )}–${moneyFormat(config.locale, config.currency, sortedPrices[sortedPrices.length - 1])}`;
+          )}–${moneyFormat(
+            config.defaultLocale,
+            config.defaultCurrency,
+            sortedPrices[sortedPrices.length - 1]
+          )}`;
           if (priceElement) priceElement.textContent = priceText;
           priceElement?.classList.remove("w-dyn-bind-empty");
         } else {
           // Variants that don't affect price
-          const price = moneyFormat(config.locale, config.currency, sortedPrices[0]);
+          const price = moneyFormat(config.defaultLocale, config.defaultCurrency, sortedPrices[0]);
           // if priceElement exists, update it
           if (priceElement) priceElement.textContent = price;
           priceAddToCart.value = price;
@@ -895,8 +899,8 @@ var Foxy = (function () {
             case "price":
               if (priceElement)
                 priceElement.textContent = moneyFormat(
-                  config.locale,
-                  config.currency,
+                  config.defaultLocale,
+                  config.defaultCurrency,
                   variantSelectionCompleteProduct[key]
                 );
               break;
