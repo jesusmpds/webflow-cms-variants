@@ -36,6 +36,7 @@ var Foxy = (function () {
   // Static properties
   let stylesAdded = false;
   let addonInit = true;
+
   function setVariantConfig(newConfig) {
     const config = {
       sortBy: "",
@@ -131,9 +132,8 @@ var Foxy = (function () {
         defaultCurrency: config.defaultCurrency,
         defaultLocale: config.defaultLocale,
       };
-      const currentPage = window.location.href;
       // Get templateSet from URL
-      const templateSetFromURL = getTemplateSetFromURL(currentPage, config);
+      const templateSetFromURL = getTemplateSetFromURL(window.location.href, config);
 
       const updateConfig = templateSetCode => {
         if (config.addonsConfig.templateSets[templateSetCode]) {
@@ -144,10 +144,26 @@ var Foxy = (function () {
         }
       };
 
+      const handleWeglotLanguageChange = (newLang, prevLang) => {
+        updateConfig(newLang);
+        removeVariantOptions();
+        addonInit = false;
+        // Set config with newConfig
+        setConfig(config, newConfig);
+
+        // Update Foxy Template Set Function
+        const existingTemplateSet = FC.json.template_set || "DEFAULT";
+        if (existingTemplateSet !== templateSet) {
+          FC.client.request(`https://${FC.settings.storedomain}/cart?template_set=${templateSet}`);
+        }
+        init();
+      };
+
       if (config.addonsConfig.templateChangeByCustomerCountry) {
         // Customer country by IP
         const country = FC.json.shipping_address.country.toLowerCase();
         updateConfig(country);
+        return;
       }
 
       // Handle Webflow Localization
@@ -159,12 +175,8 @@ var Foxy = (function () {
       if (config.addonsConfig.weglotJavascriptIntegration) {
         updateConfig(Weglot.getCurrentLang());
 
-        Weglot.on("languageChanged", function (newLang, prevLang) {
-          updateConfig(newLang);
-          removeVariantOptions();
-          addonInit = false;
-          init();
-        });
+        // Event listener
+        Weglot.on("languageChanged", handleWeglotLanguageChange);
       }
 
       // Set config with newConfig
@@ -498,11 +510,11 @@ var Foxy = (function () {
     function removeVariantOptions() {
       // Iterate through each variant group element
       variantGroups.forEach(variantGroup => {
-        const { variantOptionDesign } = variantGroup;
+        const { variantOptionDesignParent } = variantGroup;
 
         // If variant group type is radio, remove all radio inputs except the first one
         if (variantGroup.variantGroupType === "radio") {
-          const radioInputs = variantOptionDesign.querySelectorAll("input[type=radio]");
+          const radioInputs = variantOptionDesignParent.querySelectorAll("input[type=radio]");
           for (let i = 1; i < radioInputs.length; i++) {
             radioInputs[i].parentNode.remove(); // Remove the parent element of the radio input
           }
@@ -510,7 +522,7 @@ var Foxy = (function () {
 
         // If variant group type is select, remove all options except the first one
         if (variantGroup.variantGroupType === "select") {
-          const selectOptions = variantOptionDesign.querySelectorAll("option");
+          const selectOptions = variantOptionDesignParent.querySelectorAll("option");
           for (let i = 1; i < selectOptions.length; i++) {
             selectOptions[i].remove();
           }
