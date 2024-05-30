@@ -1,22 +1,22 @@
 <script type="text/javascript" src="https://cdn.weglot.com/weglot.min.js"></script>
 <script>
   Weglot.initialize({
-    api_key: "",
+    api_key: "ENTER YOU API KEY HERE",
     extra_definitions: [
       {
-        type: 1, // Type of translation, 1 for text, others: https://developers.weglot.com/api/reference#wordtype
+        type: 1,
+        selector: "[foxy-variant-group-name]", // Selector to find element with attribute
+        attribute: "name", // Name of attribute which is translated
+      }, // DO NOT REMOVE THIS FIRST EXTRA DEFINITION
+      {
+        type: 1,
         selector: "[foxy-id=variant-item]", // Selector to find element with attribute
         attribute: "foxy-variant-size", // Name of attribute which is translated
       },
       {
-        type: 1, // Type of translation, 1 for text, others: https://developers.weglot.com/api/reference#wordtype
+        type: 1,
         selector: "[foxy-id=variant-item]", // Selector to find element with attribute
         attribute: "foxy-variant-color", // Name of attribute which is translated
-      },
-      {
-        type: 1, // Type of translation, 1 for text, others: https://developers.weglot.com/api/reference#wordtype
-        selector: "[foxy-variant-group-name]", // Selector to find element with attribute
-        attribute: "name", // Name of attribute which is translated
       },
     ],
   });

@@ -31,3 +31,10 @@ const config = {
 
 const variants = Foxy.setVariantConfig(config);
 variants.init();
+
+// Multiple instances init
+
+(() => {
+  const variants = Foxy.setVariantConfig(config);
+  variants.init();
+})();
