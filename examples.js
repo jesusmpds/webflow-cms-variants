@@ -21,11 +21,7 @@ const config = {
         selectUnavailableLabel: "No disponible",
       },
     },
-    templateChangeByCustomerCountry: false,
-    templateChangeBySubdirectory: false,
-    templateChangeBySubdomain: false,
-    webflowLocalization: false,
-    weglotJavascriptIntegration: false,
+    templateChangeTrigger: ["country", "subdirectory", "subdomain", "weglotjs"],
   },
 };
 
@@ -33,7 +29,6 @@ const variants = Foxy.setVariantConfig(config);
 variants.init();
 
 // Multiple instances init
-
 (() => {
   const variants = Foxy.setVariantConfig(config);
   variants.init();
