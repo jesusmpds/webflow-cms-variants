@@ -22,7 +22,11 @@ const config = {
         selectUnavailableLabel: "No disponible",
       },
     },
-    templateChangeTrigger: window.location.href.includes("spanish") ? "subdirectory" : "weglotjs",
+    templateChangeTrigger: window.location.href.includes("switch")
+      ? "switch"
+      : window.location.href.includes("spanish")
+      ? "subdirectory"
+      : "weglotjs",
   },
 };
 
@@ -31,8 +35,10 @@ var Weglot = Weglot || {};
 var Foxy = (function () {
   // Static properties
   let stylesAdded = false;
+  let switchEventListenerSet = false;
 
   function setVariantConfig(newConfig) {
+    // Constants and variables
     const config = {
       sortBy: "",
       sortOrder: "",
@@ -46,11 +52,6 @@ var Foxy = (function () {
       multilingual: false,
       addonsConfig: null,
     };
-
-    const firstConfigDefaults = { ...newConfig };
-    setConfig(config, newConfig);
-
-    // Constants and variables
     const disableClass = "foxy-disable";
     const disableOptionClass = "foxy-disable-option";
     const foxy_variant_group = "foxy-variant-group";
@@ -63,16 +64,20 @@ var Foxy = (function () {
     let variantGroups = [];
     let addonInit = true;
 
+    // Save first config and update internal config for instance
+    const firstConfigDefaults = { ...newConfig };
+    setConfig(config, newConfig);
+    // Check container where the instance will get it's data
     let container = setContainer();
 
     const foxyForm = container.querySelector("[foxy-id='form']");
     const imageElement = container.querySelector("[foxy-id='image']");
-    const quantityElement = foxyForm.querySelector("input[name='quantity']");
     const priceElement = container.querySelector("[foxy-id='price']");
     const inventoryElement = container.querySelector("[foxy-id='inventory']");
-    const priceAddToCart = foxyForm.querySelector("input[name='price']");
-    const addToCartQuantityMax = foxyForm.querySelector("input[name='quantity_max']");
-    const variantGroupElements = foxyForm.querySelectorAll(`[${foxy_variant_group}]`);
+    const quantityElement = foxyForm?.querySelector("input[name='quantity']");
+    const priceAddToCart = foxyForm?.querySelector("input[name='price']");
+    const addToCartQuantityMax = foxyForm?.querySelector("input[name='quantity_max']");
+    const variantGroupElements = foxyForm?.querySelectorAll(`[${foxy_variant_group}]`);
     const foxyTemplateSwitch = document.querySelector(foxy_template_switch);
 
     //Insert disabled class styles
@@ -135,7 +140,6 @@ var Foxy = (function () {
 
       const isTemplateChangeByCountry = config.addonsConfig.templateChangeTrigger === "country";
       const isTemplateChangeByWeglotJS = config.addonsConfig.templateChangeTrigger === "weglotjs";
-      const isTemplateChangeBySwitch = config.addonsConfig.templateChangeTrigger === "switch";
 
       // helper function
       const updateNewConfig = templateSetCode => {
@@ -177,14 +181,13 @@ var Foxy = (function () {
         const element = e.target;
         const templateSetCode = element.getAttribute("foxy-template");
         if (templateSetCode) {
+          addonInit = false;
           updateNewConfig(templateSetCode);
+          setConfig(config, newAddonConfig);
           updateTemplateSet(templateSet, true);
         }
       };
 
-      if (isTemplateChangeBySwitch) {
-        foxyTemplateSwitch.addEventListener("click", handleTemplateSwitcher);
-      }
       if (isTemplateChangeByCountry) {
         // Customer country by IP
         const country = FC.json.shipping_address.country.toLowerCase();
@@ -206,6 +209,12 @@ var Foxy = (function () {
 
       // Update Foxy Template Set Function
       updateTemplateSet(templateSet);
+
+      // Set event handler for template set switcher if it exists
+      if (!switchEventListenerSet && foxyTemplateSwitch) {
+        foxyTemplateSwitch?.addEventListener("click", handleTemplateSwitcher);
+        switchEventListenerSet = true;
+      }
     }
 
     function updateTemplateSet(templateSet, initVariantLogic = false) {
@@ -241,8 +250,8 @@ var Foxy = (function () {
 
       setInventory();
 
-      // Handle selected variants
-      foxyForm.addEventListener("change", handleVariantSelection);
+      // Handle selected variants if foxyform is set
+      foxyForm?.addEventListener("change", handleVariantSelection);
     }
 
     function setDefaults() {
@@ -291,6 +300,8 @@ var Foxy = (function () {
     function buildVariantGroupList() {
       // Get variant group names, any custom sort orders if they exist, and their element design
       // either radio or select
+      if (!variantGroupElements) return;
+
       variantGroupElements.forEach(variantGroupElement => {
         let editorElementGroupName;
         const cmsVariantGroupName = sanitize(variantGroupElement.getAttribute(foxy_variant_group));
@@ -568,6 +579,7 @@ var Foxy = (function () {
       variantGroups = [];
     }
 
+    //TODO check this
     function addPrice() {
       //--- Product doesn't have variants---
       if (variantItems.array.length <= 1) {
@@ -624,7 +636,7 @@ var Foxy = (function () {
           const price = moneyFormat(config.defaultLocale, config.defaultCurrency, sortedPrices[0]);
           // if priceElement exists, update it
           if (priceElement) priceElement.textContent = price;
-          priceAddToCart.value = price;
+          if (priceAddToCart) priceAddToCart.value = price;
         }
       }
     }
