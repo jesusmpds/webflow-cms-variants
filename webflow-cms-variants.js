@@ -17,16 +17,13 @@ const config = {
       gb: { currency: "gbp", locale: "en-GB" },
     },
     translations: {
+      // Add translations for each template set code.
       es: {
         inventoryDefaultLabel: "Por favor, elige opciones",
         selectUnavailableLabel: "No disponible",
       },
     },
-    templateChangeTrigger: window.location.href.includes("switch")
-      ? "switch"
-      : window.location.href.includes("spanish")
-      ? "subdirectory"
-      : "weglotjs",
+    templateChangeTrigger: window.location.href.includes("spanish") ? "subdirectory" : "weglotjs",
   },
 };
 
@@ -35,7 +32,6 @@ var Weglot = Weglot || {};
 var Foxy = (function () {
   // Static properties
   let stylesAdded = false;
-  let switchEventListenerSet = false;
 
   function setVariantConfig(newConfig) {
     // Constants and variables
@@ -63,6 +59,8 @@ var Foxy = (function () {
     let variantItems = { serialized: {}, array: [] };
     let variantGroups = [];
     let addonInit = true;
+
+    let switchEventListenerSet = false;
 
     // Save first config and update internal config for instance
     const firstConfigDefaults = { ...newConfig };
@@ -182,6 +180,7 @@ var Foxy = (function () {
         const templateSetCode = element.getAttribute("foxy-template");
         if (templateSetCode) {
           addonInit = false;
+          removeVariantOptions();
           updateNewConfig(templateSetCode);
           setConfig(config, newAddonConfig);
           updateTemplateSet(templateSet, true);
@@ -250,7 +249,7 @@ var Foxy = (function () {
 
       setInventory();
 
-      // Handle selected variants if foxyform is set
+      // Handle selected variants if foxy form is set
       foxyForm?.addEventListener("change", handleVariantSelection);
     }
 
@@ -552,11 +551,13 @@ var Foxy = (function () {
     }
 
     function removeVariantOptions() {
+      if (!variantGroups.length) return;
       // Iterate through each variant group element
       variantGroups.forEach(variantGroup => {
         const { variantOptionDesignParent } = variantGroup;
 
         // If variant group type is radio, remove all radio inputs except the first one
+        // known issue that if the first one is selected on re rendering all will have that style applied
         if (variantGroup.variantGroupType === "radio") {
           const radioInputs = variantOptionDesignParent.querySelectorAll("input[type=radio]");
           for (let i = 1; i < radioInputs.length; i++) {
@@ -579,7 +580,6 @@ var Foxy = (function () {
       variantGroups = [];
     }
 
-    //TODO check this
     function addPrice() {
       //--- Product doesn't have variants---
       if (variantItems.array.length <= 1) {
