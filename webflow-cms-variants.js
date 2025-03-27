@@ -90,9 +90,15 @@ var Foxy = (function () {
       stylesAdded = true;
     }
 
-    function setConfig(config, newConfig) {
-      Object.assign(config, newConfig);
+function setConfig(config, newConfig) {
+  if (newConfig && typeof newConfig === "object") {
+    for (const key in newConfig) {
+      if (key in config) {
+        config[key] = newConfig[key];
+      }
     }
+  }
+}
 
     function setContainer() {
       let container = document;
