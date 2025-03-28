@@ -641,8 +641,9 @@ function setConfig(config, newConfig) {
           // Variants that don't affect price
           const price = moneyFormat(config.defaultLocale, config.defaultCurrency, sortedPrices[0]);
           // if priceElement exists, update it
+          priceElement?.classList.remove("w-dyn-bind-empty");
           if (priceElement) priceElement.textContent = price;
-          if (priceAddToCart) priceAddToCart.value = price;
+          if (priceAddToCart) priceAddToCart.value = parseFloat(sortedPrices[0]);
         }
       }
     }
