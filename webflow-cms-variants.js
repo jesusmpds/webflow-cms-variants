@@ -90,15 +90,15 @@ var Foxy = (function () {
       stylesAdded = true;
     }
 
-function setConfig(config, newConfig) {
-  if (newConfig && typeof newConfig === "object") {
-    for (const key in newConfig) {
-      if (key in config) {
-        config[key] = newConfig[key];
+    function setConfig(config, newConfig) {
+      if (newConfig && typeof newConfig === "object") {
+        for (const key in newConfig) {
+          if (key in config) {
+            config[key] = newConfig[key];
+          }
+        }
       }
     }
-  }
-}
 
     function setContainer() {
       let container = document;
@@ -926,7 +926,11 @@ function setConfig(config, newConfig) {
           currentVariantSelectionElement.value,
           selectedProductVariants
         );
-        updateVariantOptions(availableProductsStateChange, variantSelectionGroup);
+        updateVariantOptions(
+          availableProductsStateChange,
+          variantSelectionGroup,
+          currentVariantSelectionElement
+        );
       }
     }
 
@@ -1055,3 +1059,4 @@ function setConfig(config, newConfig) {
     setVariantConfig,
   };
 })(FC, Weglot);
+
