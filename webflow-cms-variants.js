@@ -587,15 +587,41 @@ var Foxy = (function () {
     }
 
     function addPrice() {
-      //--- Product doesn't have variants---
-      if (variantItems.array.length <= 1) {
-        if (priceElement)
+      //--- Product doesn't have variants or it's just 1---
+      if (variantItems.array.length === 1) {
+      const variantPrice = variantItems.array[0].price;
+      if (priceElement) {
+        priceElement.textContent = moneyFormat(
+          config.defaultLocale,
+          config.defaultCurrency,
+          variantPrice
+        );
+        priceElement.classList.remove("w-dyn-bind-empty");
+      }
+      if (priceAddToCart) {
+        priceAddToCart.value = parseFloat(variantPrice);
+      }
+    } 
+    
+    if(!variantItems.array.length){
+      // Case: no variants—try to use the priceElement's existing text, if valid.
+      if (priceElement && priceElement.textContent) {
+        const numericPrice = Number(priceElement.textContent);
+        if (!isNaN(numericPrice)) {
           priceElement.textContent = moneyFormat(
             config.defaultLocale,
             config.defaultCurrency,
-            priceElement.textContent
+            numericPrice
           );
+          priceElement.classList.remove("w-dyn-bind-empty");
+        } else {
+          // No valid price to display.
+          priceElement.textContent = "";
+          priceElement.classList.add("w-dyn-bind-empty");
+        }
       }
+      return;
+    }
 
       //--- Product has variants---
       if (variantItems.array.length > 1) {
