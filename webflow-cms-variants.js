@@ -1,31 +1,31 @@
 // Foxy Variant Script v2.0.0
-const config = {
-  sortBy: "",
-  sortOrder: "",
-  defaultLocale: "en-US",
-  defaultCurrency: "USD",
-  priceDisplay: "low",
-  inventoryDefaultLabel: "Please choose options",
-  selectUnavailableLabel: "Unavailable",
-  inventoryControl: false,
-  multiCurrency: true,
-  multilingual: true,
-  addonsConfig: {
-    // Add template sets for new currencies/languages with their currency-locale pairs as needed
-    templateSets: {
-      es: { currency: "eur", locale: "es-ES" },
-      gb: { currency: "gbp", locale: "en-GB" },
-    },
-    translations: {
-      // Add translations for each template set code.
-      es: {
-        inventoryDefaultLabel: "Por favor, elige opciones",
-        selectUnavailableLabel: "No disponible",
-      },
-    },
-    templateChangeTrigger: window.location.href.includes("spanish") ? "subdirectory" : "weglotjs",
-  },
-};
+// const config = {
+//   sortBy: "",
+//   sortOrder: "",
+//   defaultLocale: "en-US",
+//   defaultCurrency: "USD",
+//   priceDisplay: "low",
+//   inventoryDefaultLabel: "Please choose options",
+//   selectUnavailableLabel: "Unavailable",
+//   inventoryControl: false,
+//   multiCurrency: true,
+//   multilingual: true,
+//   addonsConfig: {
+//     // Add template sets for new currencies/languages with their currency-locale pairs as needed
+//     templateSets: {
+//       es: { currency: "eur", locale: "es-ES" },
+//       gb: { currency: "gbp", locale: "en-GB" },
+//     },
+//     translations: {
+//       // Add translations for each template set code.
+//       es: {
+//         inventoryDefaultLabel: "Por favor, elige opciones",
+//         selectUnavailableLabel: "No disponible",
+//       },
+//     },
+//     templateChangeTrigger: window.location.href.includes("spanish") ? "subdirectory" : "weglotjs",
+//   },
+// };
 
 var FC = FC || {};
 var Weglot = Weglot || {};
@@ -728,36 +728,20 @@ var Foxy = (function () {
 
     function handleVariantSelection(e) {
       const targetElement = e.target;
-      const { value } = targetElement;
-      const currentVariantSelectionElement = targetElement;
-      const currentVariantSelection = value;
-      // Selecting the default select option returns early.
-      if (!value) return;
+      const currentVariantSelection = targetElement.value;
+      if (!currentVariantSelection) return;
 
-      // Selecting or making a change to a input or select outside a variant group won't work
-      if (!targetElement.closest(`div[${foxy_variant_group}]`)) return;
+      if (!targetElement.closest(`div[foxy-variant-group]`)) return;
 
-      const variantSelectionGroup = sanitize(targetElement.getAttribute(foxy_variant_group_name));
+      const variantSelectionGroup = sanitize(targetElement.getAttribute("foxy-variant-group-name"));
 
-      removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, false);
+      removeDisabledStyleVariantGroupOptions(targetElement, false);
+
+      updateVariantOptions(variantSelectionGroup, currentVariantSelection, targetElement);
 
       const selectedProductVariants = getSelectedVariantOptions();
-
-      console.log("selectedProductVariants", selectedProductVariants);
-
-      const availableProductsPerVariant = getAvailableProductsPerVariantSelection(
-        currentVariantSelection,
-        selectedProductVariants
-      );
-
-      console.log("availableProductsPerVariant", availableProductsPerVariant);
-
-      updateVariantOptions(
-        availableProductsPerVariant,
-        variantSelectionGroup,
-        currentVariantSelectionElement
-      );
-      updateProductInfo(availableProductsPerVariant, selectedProductVariants);
+      const finalAvailable = getAvailableProductsPerVariantSelection(selectedProductVariants);
+      updateProductInfo(finalAvailable, selectedProductVariants);
     }
 
     function removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, resetChoices) {
@@ -810,154 +794,175 @@ var Foxy = (function () {
       return selectedProductVariants;
     }
 
-    function getAvailableProductsPerVariantSelection(
-      currentVariantSelection,
-      selectedProductVariants
-    ) {
-      // If inventory control is disabled, adds true to the condition
-      const ifIsInventoryControlEnabled = inventory =>
-        config.inventoryControl ? Number(inventory) > 0 : true;
+  function getAvailableProductsPerVariantSelection(selectedProductVariants, restrictedMatch = false) {
 
-      // More than 1 selected variant
-      if (variantGroups.length > 2) {
-        return variantItems.array.filter(variant => {
-          const inventory = Number(variant.inventory);
-          let isProduct = [];
-          Object.keys(selectedProductVariants).forEach(variantOptionKey => {
-            variant[variantOptionKey] === selectedProductVariants[variantOptionKey]
-              ? isProduct.push(true)
-              : isProduct.push(false);
-          });
-          return (
-            isProduct.every(productCheck => productCheck === true) &&
-            ifIsInventoryControlEnabled(inventory)
-          );
-        });
-      }
-      if (variantGroups.length <= 2) {
-        // One, or none selected variants or variant selection complete
-        const availableProductsPerVariant = [];
-        variantItems.array.forEach(variant => {
-          const inventory = Number(variant.inventory);
-          const currentProduct = Object.values(variant);
-          if (
-            currentProduct.includes(currentVariantSelection) &&
-            ifIsInventoryControlEnabled(inventory)
-          ) {
-            availableProductsPerVariant.push(variant);
-          }
-        });
-        return availableProductsPerVariant;
-      }
+    const ifIsInventoryControlEnabled = inventory =>
+      config.inventoryControl ? Number(inventory) > 0 : true;
+
+    const userHasChosenAllGroups = isVariantsSelectionComplete();
+
+    const chosenKeys = Object.keys(selectedProductVariants).filter(key => {
+      const val = selectedProductVariants[key];
+      return val !== undefined && val !== "";
+    });
+
+    if (userHasChosenAllGroups && !restrictedMatch) {
+      return variantItems.array.filter(variant => {
+        // If inventoryControl is on, skip zero or negative
+        return ifIsInventoryControlEnabled(variant.inventory);
+      });
     }
+    
+    return variantItems.array.filter(variant => {
+      if (!ifIsInventoryControlEnabled(variant.inventory)) {
+        return false;
+      }
+      for (const key of chosenKeys) {
+        if (variant[key] !== selectedProductVariants[key]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
 
-    function updateVariantOptions(
-      availableProductsPerVariant,
-      variantSelectionGroup,
-      currentVariantSelectionElement
-    ) {
-      const otherVariantGroups = variantGroups.filter(
-        variantGroup => variantGroup.name !== variantSelectionGroup
-      );
-      console.log("otherVariantGroups", otherVariantGroups);
+    function updateVariantOptions(variantSelectionGroup, currentVariantSelection, currentVariantSelectionElement) {
+      const selectedProductVariants = getSelectedVariantOptions();
+      const availableProducts = getAvailableProductsPerVariantSelection(selectedProductVariants);
+      console.log("selectedProductVariants", selectedProductVariants);
+      console.log("availableProducts updateVariantOptions", availableProducts);
       let variantGroupsStateChange = false;
 
-      otherVariantGroups.forEach(otherVariantGroup => {
-        const { editorElementGroupName, element, variantGroupType, name, options } =
-          otherVariantGroup;
-        console.log("otherVariantGroup", otherVariantGroup);
-        const otherVariantGroupName = capitalizeFirstLetter(
-          editorElementGroupName ? editorElementGroupName : name
-        );
-        // Check if other groups have selections
-        const hasSelection = hasVariantSelection(element, variantGroupType);
+      variantGroups.forEach(group => {
+        const { name, variantGroupType, element } = group;
+        const currentValue = selectedProductVariants[name] || "";
 
-        let availableProductOptions = availableProductsPerVariant.map(e => e[name]);
-        let unavailableOptions = options.filter(value => !availableProductOptions.includes(value));
-        console.log("unavailableOptions for ", name, unavailableOptions);
-        // Disable unavailable options for radio elements or select input elements.
-        if (variantGroupType === "radio") {
-          //Remove disabled
-          element.querySelectorAll(`input[name=${otherVariantGroupName}]`).forEach(input => {
-            input.parentElement.classList.remove(disableClass);
-          });
-          if (unavailableOptions.length !== 0) {
-            // Add disabled class to unavailable options
-            console.log("element for radio", element);
-            unavailableOptions.forEach(option => {
-              const radioElements = element.querySelectorAll("input[type='radio']");
+        // Skip reset for the last selected group
+        if (!currentValue || name === variantSelectionGroup) return;
 
-              const exactMatchOptionInput = Array.from(radioElements).find(
-                input => input.value === option
-              );
+        const availableProducts = getAvailableProductsPerVariantSelection(selectedProductVariants, true);
+        const stillValid = availableProducts.some(prod => prod[name] === currentValue);
+        console.log( `Checking if "${currentValue}" is still valid for group "${name}": ${stillValid}`);
+        if (!stillValid) {
+          console.log(`Resetting group "${name}" from "${currentValue}" (now invalid).`);
+          selectedProductVariants[name] = "";
+          variantGroupsStateChange = true;
 
-              exactMatchOptionInput.parentElement.classList.add(disableClass);
-
-              // if variant group already has a selection
-              if (hasSelection) {
-                const unavailableElement =
-                  exactMatchOptionInput.checked === true ? exactMatchOptionInput : false;
-                if (unavailableElement) {
-                  unavailableElement.checked = false;
-                  unavailableElement.parentElement.classList.add(disableClass);
-                  console.log(unavailableElement?.previousElementSibling?.classList);
-                  unavailableElement?.previousElementSibling?.classList?.remove(
-                    "w--redirected-checked"
-                  );
-                  variantGroupsStateChange = true;
+          if (variantGroupType === "select") {
+            const selectEl = element.querySelector("select");
+            if (selectEl) selectEl.selectedIndex = 0;
+          } else if (variantGroupType === "radio") {
+            const radios = element.querySelectorAll("input[type='radio']");
+            radios.forEach(radio => {
+              if (radio.checked) {
+                radio.checked = false;
+                if (radio.parentElement.classList.contains(disableClass)) {
+                  radio.parentElement.classList.remove(disableClass);
                 }
-              }
-            });
-          }
-        } else if (variantGroupType === "select") {
-          element.querySelectorAll(`select option.${disableOptionClass}`).forEach(option => {
-            option.classList.remove(disableOptionClass);
-
-            // Get the option textContent split it by the unavailable text and remove it
-            const unavailableText = ` (${config.selectUnavailableLabel})`;
-            const optionText = option.textContent.split(unavailableText)[0];
-            option.textContent = optionText;
-          });
-
-          if (unavailableOptions.length !== 0) {
-            // Add disabled class to unavailable options and unavailable text from config
-            unavailableOptions.forEach(option => {
-              const selectOptions = element.querySelector("select")?.options;
-
-              const exactMatchOption = Array.from(selectOptions).find(opt => opt.value === option);
-              const selectedOptionValue = element.querySelector("select").selectedOptions[0].value;
-              exactMatchOption.classList.add(disableOptionClass);
-              if (config.selectUnavailableLabel) {
-                const unavailableText = `(${config.selectUnavailableLabel})`;
-                exactMatchOption.textContent = `${exactMatchOption.textContent} ${unavailableText}`;
-              }
-
-              // if variant group already has a selection
-              if (hasSelection && selectedOptionValue === option) {
-                element.querySelector(`select`).selectedIndex = 0;
-                variantGroupsStateChange = true;
+                if (radio.previousElementSibling) {
+                  radio.previousElementSibling.classList.remove("w--redirected-checked");
+                }
               }
             });
           }
         }
       });
 
-      // Update variant groups state
+      let finalSelected = selectedProductVariants;
+      let finalAvailable = availableProducts;
       if (variantGroupsStateChange) {
-        removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, true);
-
-        const selectedProductVariants = getSelectedVariantOptions();
-
-        const availableProductsStateChange = getAvailableProductsPerVariantSelection(
-          currentVariantSelectionElement.value,
-          selectedProductVariants
-        );
-        updateVariantOptions(
-          availableProductsStateChange,
-          variantSelectionGroup,
-          currentVariantSelectionElement
-        );
+        finalSelected = getSelectedVariantOptions();
+        finalAvailable = getAvailableProductsPerVariantSelection(finalSelected);
+        console.log("finalAvailable", finalAvailable);
       }
+
+      disableInvalidOptionsAcrossAllGroups(
+        finalSelected,
+        finalAvailable,
+        variantSelectionGroup,
+        currentVariantSelection
+      );
+
+      if (variantGroupsStateChange && currentVariantSelectionElement) {
+        console.log("Some old selection was reset. Removing disabled style from changed element...");
+        removeDisabledStyleVariantGroupOptions(currentVariantSelectionElement, true);
+      }
+    }
+
+    function disableInvalidOptionsAcrossAllGroups(
+      selectedProductVariants,
+      finalAvailable,
+      lastChangedGroup,
+      lastChangedValue
+    ) {
+      variantGroups.forEach(group => {
+        const { name, variantGroupType, element } = group;
+        const isChangedGroup = name === lastChangedGroup;
+
+        if (variantGroupType === "select") {
+          const selectEl = element.querySelector("select");
+          if (!selectEl) return;
+
+          const options = Array.from(selectEl.options);
+          const unavailableText = config.selectUnavailableLabel
+            ? ` (${config.selectUnavailableLabel})`
+            : "";
+
+          options.forEach(opt => {
+            if (!opt.value) return;
+
+            const candidate = { ...selectedProductVariants, [name]: opt.value };
+            const canExist = finalAvailable.some(prod => {
+              return Object.entries(candidate).every(([k, val]) => {
+                if (!val) return true;
+                return prod[k] === val;
+              });
+            });
+
+            const isLastSelected = isChangedGroup && opt.value === lastChangedValue;
+
+            if (!canExist && !isLastSelected) {
+              if (!opt.classList.contains(disableOptionClass)) {
+                opt.classList.add(disableOptionClass);
+              }
+              if (unavailableText && !opt.textContent.includes(unavailableText)) {
+                opt.textContent += unavailableText;
+              }
+            } else {
+              if (opt.classList.contains(disableOptionClass)) {
+                opt.classList.remove(disableOptionClass);
+              }
+              if (unavailableText && opt.textContent.includes(unavailableText)) {
+                opt.textContent = opt.textContent.replace(unavailableText, "");
+              }
+            }
+          });
+        } else if (variantGroupType === "radio") {
+          const radios = element.querySelectorAll("input[type='radio']");
+          radios.forEach(radio => {
+            if (!radio.value) return;
+            const candidate = { ...selectedProductVariants, [name]: radio.value };
+            const canExist = finalAvailable.some(prod => {
+              return Object.entries(candidate).every(([k, val]) => {
+                if (!val) return true;
+                return prod[k] === val;
+              });
+            });
+
+            const isLastSelected = isChangedGroup && radio.value === lastChangedValue;
+
+            if (!canExist && !isLastSelected) {
+              if (!radio.parentElement.classList.contains(disableClass)) {
+                radio.parentElement.classList.add(disableClass);
+              }
+            } else {
+              if (radio.parentElement.classList.contains(disableClass)) {
+                radio.parentElement.classList.remove(disableClass);
+              }
+            }
+          });
+        }
+      });
     }
 
     function updateProductInfo(availableProductsPerVariant, selectedProductVariants) {
@@ -1025,22 +1030,6 @@ var Foxy = (function () {
       return false;
     }
 
-    function hasVariantSelection(variantGroupElement, variantGroupType) {
-      if (variantGroupType === "radio") {
-        if (variantGroupElement.querySelectorAll("[required]:checked").length > 0) {
-          return true;
-        }
-        return false;
-      }
-      if (variantGroupType === "select") {
-        if (variantGroupElement.querySelector("select").selectedOptions[0].value) {
-          return true;
-        }
-        return false;
-      }
-      return false;
-    }
-
     function moneyFormat(locale, currency, number) {
       const numericValue = parseFloat(number);
       let decimalPlaces = numericValue.toString().includes(".")
@@ -1059,10 +1048,6 @@ var Foxy = (function () {
         minimumFractionDigits: decimalPlaces,
         maximumFractionDigits: decimalPlaces,
       }).format(numericValue);
-    }
-
-    function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
     function sanitize(string) {
@@ -1085,4 +1070,3 @@ var Foxy = (function () {
     setVariantConfig,
   };
 })(FC, Weglot);
-
