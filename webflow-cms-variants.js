@@ -998,14 +998,29 @@ var Foxy = (function () {
               // Update inventory element
               setInventory(isVariantsSelectionDone);
               break;
-            case "price":
-              if (priceElement)
+            case "price":{
+              if (priceElement) {
                 priceElement.textContent = moneyFormat(
                   config.defaultLocale,
                   config.defaultCurrency,
                   variantSelectionCompleteProduct[key]
                 );
+              }
+                const numericValue = parseFloat(variantSelectionCompleteProduct[key]);
+                let decimalPlaces = numericValue.toString().includes(".")
+                  ? numericValue.toString().split(".")[1].length
+                  : 0;
+
+                if (config.pricePrecision && config.pricePrecision > decimalPlaces) {
+                  decimalPlaces = config.pricePrecision;
+                }
+
+                priceAddToCart.value = parseFloat(variantSelectionCompleteProduct[key]).toFixed(
+                  decimalPlaces
+                );
+              
               break;
+            }
             case "image":
               // Remove srcset from primary image element
               imageElement?.setAttribute("srcset", "");
@@ -1036,10 +1051,8 @@ var Foxy = (function () {
         ? numericValue.toString().split(".")[1].length
         : 0;
 
-      const webflowFractionDigits = window?.__WEBFLOW_CURRENCY_SETTINGS?.fractionDigits;
-
-      if (webflowFractionDigits && webflowFractionDigits > decimalPlaces) {
-        decimalPlaces = webflowFractionDigits;
+      if (config.pricePrecision && config.pricePrecision > decimalPlaces) {
+        decimalPlaces = config.pricePrecision;
       }
 
       return new Intl.NumberFormat(locale, {
